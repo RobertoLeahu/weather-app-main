@@ -1,0 +1,169 @@
+:root {
+  /* Colores Neutrales */
+  --neutral-900: hsl(243, 96%, 9%);
+  --neutral-800: hsl(243, 27%, 20%);
+  --neutral-700: hsl(243, 23%, 24%);
+  --neutral-600: hsl(243, 23%, 30%);
+  --neutral-300: hsl(240, 6%, 70%);
+  --neutral-200: hsl(250, 6%, 84%);
+  --neutral-0: hsl(0, 0%, 100%);
+
+  /* Colores de Acento */
+  --orange-500: hsl(28, 100%, 52%);
+  --blue-500: hsl(233, 67%, 56%);
+  --blue-700: hsl(248, 70%, 36%);
+
+  /* Tipografía */
+  --font-primary: 'DM Sans', sans-serif;
+  --font-secondary: 'Bricolage Grotesque', sans-serif;
+  --font-base-size: 18px;
+}
+
+button, 
+input, 
+select, 
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html{
+    font-size: var(--font-base-size);
+}
+
+body {
+  background-color: var(--neutral-900);
+  color: var(--neutral-0);
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*ESTRUCTURA GENERAL WEB*/
+.app-container{
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/*Cabecera*/
+.header-app{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo img{
+    width: 125px;
+}
+
+#units-btn {
+  background-color: var(--neutral-800);
+  color: var(--neutral-0);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-size: 0.7rem;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/*SECCIÓN DE BUSQUEDA*/
+.search-section{
+    text-align: center;
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.search-form input {
+  width: 100%;
+  padding: 15px 15px 15px 48px;
+  border-radius: 12px;
+  border: none;
+  background-color: var(--neutral-600);
+  color: white;
+  font-size: 1rem;
+}
+
+.btn-search {
+  padding: 16px;
+  background-color: #4A5CF4;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+/* --- ESCRITORIO (1440px) --- */
+@media (min-width: 1080px) {
+  
+  .app-container {
+    max-width: 1440px;
+    padding: 40px 80px;
+    gap: 80px;
+  }
+
+  .search-section h1 {
+    font-size: 3.5rem;
+    font-family: var(--font-secondary);
+    margin-bottom: 32px;
+  }
+
+  .search-form {
+    flex-direction: row;
+    justify-content: center;
+    max-width: 700px;
+    margin: 0 auto;
+    gap: 16px;
+  }
+
+  .input-group {
+    flex: 1; 
+  }
+
+  .btn-search {
+    padding: 0 32px;
+    height: 54px;
+  }
+}
