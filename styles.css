@@ -57,7 +57,22 @@ body {
     gap: 40px;
 }
 
-/*Cabecera*/
+@media (min-width: 768px) {
+  .app-container {
+    padding: 40px;
+    gap: 60px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .app-container {
+    max-width: 1080px;
+    padding: 20px 40px;
+    gap: 40px;
+  }
+}
+
+/*CABECERA*/
 .header-app{
   display: flex;
   justify-content: space-between;
@@ -87,6 +102,13 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
+}
+
+/*MAIN*/
+.main{
+  display: flex;
+  gap: 30px;
+  flex-direction: column;
 }
 
 /*SECCIÓN DE BUSQUEDA*/
@@ -136,17 +158,13 @@ body {
   border-radius: 12px;
 }
 
-/* --- BREAKPOINTS --- */
-
-/* --- TABLETS (768px - 1439px) --- */
 @media (min-width: 768px) {
-  .app-container {
-    padding: 40px;
-    gap: 60px;
+  .search-section{
+      gap: 16px;
   }
 
   .search-section h1 {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
   }
 
   .search-form {
@@ -158,17 +176,14 @@ body {
   }
 }
 
-/* --- ESCRITORIO (1440px) --- */
 @media (min-width: 1080px) {
-  
-  .app-container {
-    max-width: 1440px;
-    padding: 40px 80px;
-    gap: 80px;
-  }
+
+  .search-section{
+    gap: 10px;
+}
 
   .search-section h1 {
-    font-size: 3.5rem;
+    font-size: 2.5rem;
     font-family: var(--font-secondary);
     margin-bottom: 32px;
   }
@@ -182,11 +197,71 @@ body {
   }
 
   .input-group {
-    flex: 1; 
+    flex-grow: 1;
   }
 
   .btn-search {
     padding: 0 32px;
     height: 54px;
+  }
+}
+
+/*SECCIÓN CLIMA ACTUAL*/
+.current-weather{
+  background-image: url(assets/images/bg-today-small.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-radius: 24px;
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+  gap: 10px;
+}
+
+.current-weather h2{
+  font-size: 1.4rem;
+}
+
+.current-weather p{
+  font-size: 1rem;
+}
+
+.display-temperatures{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+
+.display-temperatures img{
+  width: 5rem;
+}
+
+#current-temperature{
+  font-size: 5rem;
+  font-family: var(--font-primary);
+  font-style: italic;
+}
+
+@media(min-width: 768px) {
+  .current-weather{
+    background-image: url(assets/images/bg-today-large.svg);
+    background-size: contain;
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+@media(min-width: 1080px) {
+  .current-weather{
+    background-image: url(assets/images/bg-today-large.svg);
+    background-size: contain;
+    flex-direction: row;
+    justify-content: center;
   }
 }
