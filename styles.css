@@ -55,17 +55,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: 40px;
-}
 
-@media (min-width: 768px) {
-  .app-container {
+  @media (min-width: 768px) {
     padding: 40px;
     gap: 60px;
   }
-}
 
-@media (min-width: 1080px) {
-  .app-container {
+  @media (min-width: 1080px) {
     max-width: 1080px;
     padding: 20px 40px;
     gap: 40px;
@@ -118,6 +114,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 32px;
+  margin-bottom: 24px;
 }
 
 .search-form {
@@ -208,6 +205,30 @@ body {
   }
 }
 
+/*DASHBOARD*/
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 1080px) {
+  .dashboard {
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .left-column {
+    flex: 0 0 60%;
+  }
+
+  .right-column { 
+    flex: 0 0 40%;
+  }
+}
+
+/*COLUMNA DE LA IZQUIERDA*/
 /*SECCIÓN CLIMA ACTUAL*/
 .current-weather {
   background-image: url(assets/images/bg-today-small.svg);
@@ -373,4 +394,62 @@ body {
   .day-cards-grid {
     grid-template-columns: repeat(7, 1fr);
   }
+}
+
+/*COLUMNA DE LA IZQUIERDA*/
+/*SECCIÓN Pronóstico por hora*/
+.hourly-forecast {
+  background-color: var(--neutral-800);
+  padding: 4px 16px;
+  border-radius: 16px;
+}
+
+.hourly-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.hourly-header h3 {
+  font-size: 1rem;
+}
+
+.hourly-header button {
+  background-color: var(--neutral-600);
+  color: var(--neutral-0);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-size: 1rem;
+}
+
+.hourly-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px;
+}
+
+.hourly-card {
+  background-color: var(--neutral-700);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 18px;
+  border: 1px solid var(--neutral-600);
+  border-radius: 8px;
+}
+
+.time-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.hourly-card img {
+  width: 50px;
 }
