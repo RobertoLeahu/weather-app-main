@@ -47,7 +47,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/*ESTRUCTURA GENERAL WEB*/
+/* ESTRUCTURA GENERAL */
 .app-container {
   width: 100%;
   margin: 0 auto;
@@ -68,7 +68,7 @@ body {
   }
 }
 
-/*CABECERA*/
+/* CABECERA */
 .header-app {
   display: flex;
   justify-content: space-between;
@@ -81,11 +81,11 @@ body {
   gap: 8px;
 }
 
-.logo img {
+.logo-img {
   width: 125px;
 }
 
-#units-btn {
+.units-btn {
   background-color: var(--neutral-800);
   color: var(--neutral-0);
   border: none;
@@ -93,21 +93,26 @@ body {
   border-radius: 8px;
   font-family: var(--font-primary);
   font-size: 0.7rem;
-
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-/*MAIN*/
+.units-btn:hover {
+  background-color: var(--neutral-700);
+}
+
+/* MAIN */
 .main {
   display: flex;
   gap: 10px;
   flex-direction: column;
 }
 
-/*SECCIÓN DE BUSQUEDA*/
+/* SECCIÓN DE BÚSQUEDA */
 .search-section {
   text-align: center;
   display: flex;
@@ -115,6 +120,27 @@ body {
   align-items: center;
   gap: 32px;
   margin-bottom: 24px;
+
+  @media (min-width: 768px) {
+    gap: 16px;
+  }
+
+  @media (min-width: 1080px) {
+    gap: 10px;
+  }
+}
+
+.search-title {
+  font-size: 1.8rem;
+
+  @media (min-width: 768px) {
+    font-size: 2.2rem;
+  }
+
+  @media (min-width: 1080px) {
+    font-size: 2.5rem;
+    font-family: var(--font-secondary);
+  }
 }
 
 .search-form {
@@ -122,12 +148,28 @@ body {
   flex-direction: column;
   gap: 12px;
   width: 100%;
+
+  @media (min-width: 768px) {
+    justify-content: center;
+    flex-direction: row;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 1080px) {
+    max-width: 700px;
+    gap: 16px;
+  }
 }
 
 .input-group {
   position: relative;
   display: flex;
   align-items: center;
+
+  @media (min-width: 768px) {
+    flex-grow: 1;
+  }
 }
 
 .search-icon {
@@ -137,104 +179,78 @@ body {
   height: 20px;
 }
 
-.search-form input {
+.search-input-field {
   width: 100%;
   padding: 15px 15px 15px 48px;
   border-radius: 12px;
-  border: none;
+  border: 1px solid var(--neutral-600);
   background-color: var(--neutral-600);
-  color: white;
+  color: var(--neutral-0);
   font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+/* ESTADOS TRADICIONALES PARA INPUT */
+.search-input-field:hover,
+.search-input-field:focus {
+  border-color: var(--neutral-0);
+  outline: none;
 }
 
 .btn-search {
   padding: 16px;
-  background-color: #4a5cf4;
-  color: white;
+  background-color: var(--blue-500);
+  color: var(--neutral-0);
   border: none;
   border-radius: 12px;
-}
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: 2px solid transparent;
 
-@media (min-width: 768px) {
-  .search-section {
-    gap: 16px;
-  }
-
-  .search-section h1 {
-    font-size: 2.2rem;
-  }
-
-  .search-form {
-    justify-content: center;
-    display: flex;
-    flex-direction: row;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
-  .input-group {
-    flex-grow: 1;
-  }
-}
-
-@media (min-width: 1080px) {
-  .search-section {
-    gap: 10px;
-  }
-
-  .search-section h1 {
-    font-size: 2.5rem;
-    font-family: var(--font-secondary);
-  }
-
-  .search-form {
-    flex-direction: row;
-    justify-content: center;
-    max-width: 700px;
-    margin: 0 auto;
-    gap: 16px;
-  }
-
-  .input-group {
-    flex-grow: 1;
-  }
-
-  .btn-search {
+  @media (min-width: 1080px) {
     padding: 0 32px;
     height: 54px;
   }
 }
 
-/*DASHBOARD*/
+/* ESTADOS TRADICIONALES PARA BOTÓN SEARCH */
+.btn-search:hover {
+  background-color: var(--blue-700);
+  outline-color: var(--blue-500);
+  outline-offset: 2px;
+}
+
+/* DASHBOARD Y COLUMNAS */
 .dashboard {
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
 
-@media (min-width: 1080px) {
-  .dashboard {
+  @media (min-width: 1080px) {
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
   }
+}
 
-  .left-column {
+.left-column {
+  @media (min-width: 1080px) {
     flex: 0 0 60%;
   }
+}
 
-  .right-column { 
+.right-column {
+  @media (min-width: 1080px) {
     flex: 0 0 40%;
   }
 }
 
-/*COLUMNA DE LA IZQUIERDA*/
-/*SECCIÓN CLIMA ACTUAL*/
+/* CLIMA ACTUAL */
 .current-weather {
   background-image: url(assets/images/bg-today-small.svg);
   background-position: center;
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: cover;
   border-radius: 24px;
   padding: 40px 32px;
   display: flex;
@@ -242,103 +258,91 @@ body {
   align-items: center;
   text-align: center;
   width: 100%;
-  margin: 0 auto;
-  gap: 10px;
+  gap: 20px;
+
+  @media (min-width: 768px) {
+    background-image: url(assets/images/bg-today-large.svg);
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 60px 40px;
+  }
 }
 
-.current-weather h2 {
-  font-size: 1.4rem;
+.location-date {
+  @media (min-width: 768px) {
+    text-align: left;
+  }
 }
 
-.current-weather p {
-  font-size: 0.8rem;
+.current-city {
+  font-size: 1.8rem;
+  margin-bottom: 4px;
+
+  @media (min-width: 768px) {
+    font-size: 2.2rem;
+  }
+}
+
+.current-date {
+  font-size: 0.9rem;
+  color: var(--neutral-200);
 }
 
 .display-temperatures {
   display: flex;
-  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 30px;
 }
 
-.display-temperatures img {
+.current-weather-icon {
   width: 5rem;
+
+  @media (min-width: 768px) {
+    width: 6rem;
+  }
 }
 
-#current-temperature {
-  font-size: 5rem;
+.current-temperature-text {
+  font-size: 6rem;
   font-family: var(--font-primary);
   font-style: italic;
-}
 
-@media (min-width: 768px) {
-  .current-weather {
-    background-image: url(assets/images/bg-today-large.svg);
-    background-size: contain;
-    flex-direction: row;
-    justify-content: center;
+  @media (min-width: 768px) {
+    font-size: 7.5rem;
   }
 }
 
-@media (min-width: 1080px) {
-  .current-weather {
-    background-image: url(assets/images/bg-today-large.svg);
-    background-size: contain;
-    flex-direction: row;
-    justify-content: center;
-  }
-}
-
-/*SECCIÓN METRÍCA DE TIEMPO*/
+/* MÉTRICAS */
 .metric-weather {
   display: grid;
-  align-items: center;
-  justify-items: center;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
-  width: 100%;
-  max-width: 1200px;
-  padding: 20px;
-  margin: 0 auto;
+  padding: 20px 0;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .metric-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 15px;
   background-color: var(--neutral-800);
   padding: 15px;
-  width: 100%;
-  min-height: 110px;
   border-radius: 12px;
   border: 1px solid var(--neutral-600);
 }
 
-.metric-card h3 {
+.metric-title {
   font-size: 0.9rem;
   color: var(--neutral-300);
 }
 
-.metric-card p {
+.metric-value {
   font-size: 1.4rem;
 }
 
-@media (min-width: 768px) {
-  .metric-weather {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (min-width: 1080px) {
-  .metric-weather {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/*SECCIÓN PRONOSTICO DIARIO*/
-.daily-forecast h3 {
+/* PRONÓSTICO DIARIO */
+.daily-title {
   font-family: var(--font-secondary);
   font-size: 0.9rem;
   margin-bottom: 20px;
@@ -348,108 +352,87 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  @media (min-width: 1080px) {
+    grid-template-columns: repeat(7, 1fr);
+  }
 }
 
 .day-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  padding: 8px;
   background-color: var(--neutral-800);
+  padding: 8px;
   border-radius: 12px;
   border: 1px solid var(--neutral-600);
   text-align: center;
 }
-.day-card h4 {
-  font-size: 0.9rem;
-}
-.day-card img {
+
+.day-icon {
   width: 66px;
 }
 
 .day-card-temperatures {
   display: flex;
-  gap: 24px;
-}
-
-.day-card-temperatures .high {
-  font-size: 0.9rem;
-  color: var(--neutral-0);
+  justify-content: center;
+  gap: 10px;
 }
 
 .day-card-temperatures .low {
-  font-size: 0.9rem;
   color: var(--neutral-300);
 }
 
-@media (min-width: 768px) {
-  .day-cards-grid {
-    grid-template-columns: repeat(5, 1fr);
-  }
-}
-
-@media (min-width: 1080px) {
-  .day-cards-grid {
-    grid-template-columns: repeat(7, 1fr);
-  }
-}
-
-/*COLUMNA DE LA IZQUIERDA*/
-/*SECCIÓN Pronóstico por hora*/
+/* PRONÓSTICO POR HORA */
 .hourly-forecast {
   background-color: var(--neutral-800);
-  padding: 4px 16px;
+  padding: 16px;
   border-radius: 16px;
 }
 
 .hourly-header {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  margin-bottom: 16px;
 }
 
-.hourly-header h3 {
-  font-size: 1rem;
-}
-
-.hourly-header button {
+.hourly-btn {
   background-color: var(--neutral-600);
-  color: var(--neutral-0);
   border: none;
   padding: 8px 16px;
   border-radius: 8px;
-  font-family: var(--font-primary);
-  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.hourly-btn:hover {
+  background-color: var(--neutral-700);
 }
 
 .hourly-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 10px;
+  gap: 12px;
 }
 
 .hourly-card {
   background-color: var(--neutral-700);
   display: flex;
-  flex-direction: row;
-  align-items: center;
   justify-content: space-between;
-  padding: 8px 18px;
-  border: 1px solid var(--neutral-600);
+  align-items: center;
+  padding: 10px 18px;
   border-radius: 8px;
+  border: 1px solid var(--neutral-600);
 }
 
 .time-info {
   display: flex;
-  flex-direction: row;
   align-items: center;
+  gap: 10px;
 }
 
-.hourly-card img {
-  width: 50px;
+.hourly-icon {
+  width: 40px;
 }
