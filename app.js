@@ -52,6 +52,10 @@ const locationDisplay = document.getElementById("location");
 const dateDisplay = document.getElementById("date");
 const weatherDisplay = document.getElementById("current-weather");
 const temperatureDisplay = document.getElementById("current-temperature");
+const feelLikeDisplay = document.getElementById("feel-like");
+const humidityDsiplay = document.getElementById("humidity");
+const windDisplay = document.getElementById("wind");
+const precipitationDisplay = document.getElementById("precipitation");
 
 // -- LÓGICA DE LA API --
 //Función para obtener la latitud y longitud de una ciudad, para luego utilizar estos datos para recoger los datos meteorológicos.
@@ -73,18 +77,19 @@ async function getLatAndLong(event) {
       getWeather(currentLat, currentLong, currentCityName, currentCountryName);
     }
   } catch (error) {
-    console.error("Error cargando ciudad introducida:", error);
+    console.error("Error cargando la ciudad introducida:", error);
   }
 }
 
 //Función para recoger los datos meteorológicos necesarios usando la latitud y longitud.
 async function getWeather(lat, long, cityName, countryName) {
   try {
-    const weatherURL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current_weather=true`;
+    const weatherURL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&timezone=auto`;
     const weatherResponse = await fetch(weatherURL);
     const weatherData = await weatherResponse.json();
+    console.log(weatherData);
 
-    if (weatherData.current_weather) {
+    if (true) {
       updateUI(weatherData, cityName, countryName);
     }
   } catch (error) {
@@ -102,11 +107,11 @@ function updateUI(weatherData, cityName, countryName) {
   }
 
   //Actualizar fecha
-  const rawDate = weatherData.current_weather.time;
+  const rawDate = weatherData.current.time;
   dateDisplay.innerText = formatDate(rawDate);
 
   //Obtener código de interpretación de tiempo y actualizar imagen del tiempo actual
-  const currentWeatherCode = weatherData.current_weather.weathercode;
+  const currentWeatherCode = weatherData.current.weather_code;
   const [condition, imagePath] = weatherCodeMap[currentWeatherCode] || [
     "Unknow",
     "",
@@ -116,7 +121,19 @@ function updateUI(weatherData, cityName, countryName) {
   weatherDisplay.alt = condition;
 
   //Actualizar temperatura
-  temperatureDisplay.innerText = `${Math.round(weatherData.current_weather.temperature)}º`;
+  temperatureDisplay.innerText = `${Math.round(weatherData.current.temperature_2m)}º`;
+
+  //Actualizar sensación termica
+  feelLikeDisplay.innerText = `${Math.round(weatherData.current.apparent_temperature)}º`;
+
+  //Actualizar humedad
+  humidityDsiplay.innerText = `${weatherData.current.relative_humidity_2m}%`;
+
+  //Actualizar viento
+  windDisplay.innerText = `${weatherData.current.wind_speed_10m} km/h`;
+
+  //Actualizar precipitación
+  precipitationDisplay.innerText = `${weatherData.current.precipitation} mm`;
 }
 
 //Función para formatear la fecha que devuelve la API
