@@ -32,7 +32,7 @@
               alt=""
             />
           </button>
-        </div>
+          </div>
       </header>
 
       <div class="main">
@@ -52,7 +52,9 @@
                 placeholder="Search for a place..."
               />
             </div>
-            <button type="submit" class="btn-search">Search</button>
+            <button type="submit" id="search-button" class="btn-search">
+              Search
+            </button>
           </form>
         </section>
 
@@ -60,8 +62,8 @@
           <div class="left-column">
             <section class="current-weather">
               <div class="location-date">
-                <h2 class="current-city" id="location">Berlin, Germany</h2>
-                <p class="current-date" id="date">Tuesday, Aug 5, 2026</p>
+                <h2 class="current-city" id="location">--</h2>
+                <p class="current-date" id="date">--</p>
               </div>
               <div class="display-temperatures">
                 <img
@@ -71,7 +73,7 @@
                   alt="Sunny"
                 />
                 <p class="current-temperature-text" id="current-temperature">
-                  68º
+                  --
                 </p>
               </div>
             </section>
@@ -190,14 +192,17 @@
             <section class="hourly-forecast">
               <div class="hourly-header">
                 <h3 class="hourly-title">Hourly forecast</h3>
-                <button class="hourly-btn">
-                  Tuesday
-                  <img
-                    class="dropdown-icon"
-                    src="assets/images/icon-dropdown.svg"
-                    alt=""
-                  />
-                </button>
+
+                <div class="dropdown-container">
+                  <button id="hourly-btn" class="hourly-btn">
+                    <span id="hourly-selected-day">Tuesday</span>
+                    <img
+                      class="dropdown-icon"
+                      src="assets/images/icon-dropdown.svg"
+                      alt=""
+                    />
+                  </button>
+                  </div>
               </div>
 
               <div class="hourly-list">
@@ -311,5 +316,6 @@
         </div>
       </div>
     </div>
+    <script src="app.js"></script>
   </body>
 </html>
