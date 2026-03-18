@@ -69,7 +69,7 @@ async function getLatAndLong(event) {
     const geoResponse = await fetch(geoURL);
     const geoData = await geoResponse.json();
 
-    if (geoData.results && geoData.results.length > 0) {
+    if (geoData.results && geoData.results.length) {
       const currentLat = geoData.results[0].latitude;
       const currentLong = geoData.results[0].longitude;
       const currentCityName = geoData.results[0].name;
@@ -84,12 +84,11 @@ async function getLatAndLong(event) {
 //Función para recoger los datos meteorológicos necesarios usando la latitud y longitud.
 async function getWeather(lat, long, cityName, countryName) {
   try {
-    const weatherURL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&timezone=auto`;
+    const weatherURL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
     const weatherResponse = await fetch(weatherURL);
     const weatherData = await weatherResponse.json();
-    console.log(weatherData);
 
-    if (true) {
+    if (weatherData.current && weatherData.daily) {
       updateUI(weatherData, cityName, countryName);
     }
   } catch (error) {
@@ -97,8 +96,15 @@ async function getWeather(lat, long, cityName, countryName) {
   }
 }
 
-//Función para actualizar los datos de la página.
+//Función para actualizar la UI
 function updateUI(weatherData, cityName, countryName) {
+  updateCurrentWeather(weatherData, cityName, countryName);
+  updateMetrics(weatherData);
+  updateDailyForecast(weatherData);
+}
+
+//Función para actualizar los datos del clima actual
+function updateCurrentWeather(weatherData, cityName, countryName) {
   //Actualizar ciudad y país
   if (countryName && cityName != countryName) {
     locationDisplay.innerText = `${cityName}, ${countryName}`;
@@ -107,14 +113,14 @@ function updateUI(weatherData, cityName, countryName) {
   }
 
   //Actualizar fecha
-  const rawDate = weatherData.current.time;
-  dateDisplay.innerText = formatDate(rawDate);
+  const date = formatDate(weatherData.current.time);
+  dateDisplay.innerText = date;
 
   //Obtener código de interpretación de tiempo y actualizar imagen del tiempo actual
   const currentWeatherCode = weatherData.current.weather_code;
   const [condition, imagePath] = weatherCodeMap[currentWeatherCode] || [
     "Unknow",
-    "",
+    "assets/images/default.webp",
   ];
 
   weatherDisplay.src = imagePath;
@@ -122,37 +128,68 @@ function updateUI(weatherData, cityName, countryName) {
 
   //Actualizar temperatura
   temperatureDisplay.innerText = `${Math.round(weatherData.current.temperature_2m)}º`;
+}
 
+//Función para actualizar los datos de métrica del clima actual.
+function updateMetrics(weatherData) {
   //Actualizar sensación termica
-  feelLikeDisplay.innerText = `${Math.round(weatherData.current.apparent_temperature)}º`;
-
+  const apparent_temperature = weatherData.current.apparent_temperature;
+  feelLikeDisplay.innerText = `${Math.round(apparent_temperature)}º`;
   //Actualizar humedad
-  humidityDsiplay.innerText = `${weatherData.current.relative_humidity_2m}%`;
-
+  const relative_humidity_2m = weatherData.current.relative_humidity_2m;
+  humidityDsiplay.innerText = `${relative_humidity_2m}%`;
   //Actualizar viento
-  windDisplay.innerText = `${weatherData.current.wind_speed_10m} km/h`;
-
+  const wind_speed_10m = weatherData.current.wind_speed_10m;
+  windDisplay.innerText = `${wind_speed_10m} km/h`;
   //Actualizar precipitación
-  precipitationDisplay.innerText = `${weatherData.current.precipitation} mm`;
+  const precipitación = weatherData.current.precipitation;
+  precipitationDisplay.innerText = `${precipitación} mm`;
+}
+
+//Función para actualizar el clima diario
+function updateDailyForecast(weatherData) {
+  const dailyData = weatherData.daily;
+  const dayCards = document.querySelectorAll(".day-card");
+
+  dayCards.forEach((card, index) => {
+    //Actualizar día
+    const dayName = formatDate(dailyData.time[index], true);
+    card.querySelector(".day-name").innerText = dayName;
+
+    //Actualizar imagen del tiempo
+    const weatherCode = dailyData.weather_code[index];
+    const [condition, imagePath] = weatherCodeMap[weatherCode] || [
+      "Unknown",
+      "assets/images/default.webp",
+    ];
+    card.querySelector(".day-icon").src = imagePath;
+    card.querySelector(".day-icon").alt = condition;
+
+    //Actualizar maximo  y mínimo
+    const maxTemperature = dailyData.temperature_2m_max[index];
+    const minTemperature = dailyData.temperature_2m_min[index];
+    card.querySelector(".high").innerText = `${Math.round(maxTemperature)}º`;
+    card.querySelector(".low").innerText = `${Math.round(minTemperature)}º`;
+  });
 }
 
 //Función para formatear la fecha que devuelve la API
-function formatDate(date) {
+function formatDate(date, isShort) {
   const dateObj = new Date(date);
+  let options;
 
-  const options = {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  };
+  if (isShort === true) {
+    options = { weekday: "short" };
+  } else {
+    options = { weekday: "long", day: "numeric", month: "long" };
+  }
 
-  let dateFormatted = dateObj.toLocaleDateString("es-ES", options);
+  let dateFormatted = dateObj.toLocaleDateString("en-US", options);
 
-  return (dateFormatted =
-    dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1));
+  return dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
 }
 
-// Función para mostrar de manera predeterminada una ciudad al abrir la app
+//Función para mostrar de manera predeterminada una ciudad al abrir la app
 async function loadDefaultWeather(cityName) {
   try {
     const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&language=es`;
