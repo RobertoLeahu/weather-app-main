@@ -84,7 +84,7 @@ async function getLatAndLong(event) {
 //Función para recoger los datos meteorológicos necesarios usando la latitud y longitud.
 async function getWeather(lat, long, cityName, countryName) {
   try {
-    const weatherURL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
+    const weatherURL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
     const weatherResponse = await fetch(weatherURL);
     const weatherData = await weatherResponse.json();
 
@@ -101,6 +101,7 @@ function updateUI(weatherData, cityName, countryName) {
   updateCurrentWeather(weatherData, cityName, countryName);
   updateMetrics(weatherData);
   updateDailyForecast(weatherData);
+  updateHourlyForecast(weatherData);
 }
 
 //Función para actualizar los datos del clima actual
@@ -115,7 +116,6 @@ function updateCurrentWeather(weatherData, cityName, countryName) {
   //Actualizar fecha
   const date = formatDate(weatherData.current.time);
   dateDisplay.innerText = date;
-
   //Obtener código de interpretación de tiempo y actualizar imagen del tiempo actual
   const currentWeatherCode = weatherData.current.weather_code;
   const [condition, imagePath] = weatherCodeMap[currentWeatherCode] || [
@@ -153,7 +153,7 @@ function updateDailyForecast(weatherData) {
 
   dayCards.forEach((card, index) => {
     //Actualizar día
-    const dayName = formatDate(dailyData.time[index], true);
+    const dayName = formatDate(dailyData.time[index], "short");
     card.querySelector(".day-name").innerText = dayName;
 
     //Actualizar imagen del tiempo
@@ -173,19 +173,74 @@ function updateDailyForecast(weatherData) {
   });
 }
 
+// Función para actualizar el pronóstico por horas
+function updateHourlyForecast(weatherData) {
+  const currentData = weatherData.current;
+  const hourlyData = weatherData.hourly;
+  const currentTimeString = currentData.time;
+  const currentHourString = currentTimeString.split(":")[0] + ":00";
+  console.log(currentData);
+  console.log(hourlyData);
+
+  const day = formatDate(currentData.time, "dayOnly");
+  document.querySelector("#hourly-selected-day").innerText = day;
+
+  const startIndex = hourlyData.time.indexOf(currentHourString);
+
+  if (startIndex === -1) {
+    console.error("No se encontró la hora actual en el pronóstico.");
+    return;
+  }
+
+  const hourlyList = document.querySelectorAll(".hourly-card");
+
+  hourlyList.forEach((card, index) => {
+    //Indice de la hora + indice del contador
+    let apiIndex = startIndex + index;
+
+    //Comprobar que existen datos
+    if (hourlyData.time[apiIndex]) {
+      // Obtener código y actualizar imagen de clima
+      const [condition, imagePath] = weatherCodeMap[
+        hourlyData.weather_code[apiIndex]
+      ] || ["Unknown", "assets/images/icon-partly-cloudy.webp"];
+
+      card.querySelector(".hourly-icon").src = imagePath;
+      card.querySelector(".hourly-icon").alt = condition;
+
+      // Actualizar hora
+      const time = formatTime(hourlyData.time[apiIndex]);
+      card.querySelector(".hourly-time").innerText = time;
+
+      // Actualizar la temperatura
+      const temperature = Math.round(hourlyData.temperature_2m[apiIndex]);
+      card.querySelector(".high").innerText = `${temperature}º`;
+    }
+  });
+}
+
+//Función para formatear la hora que devuelve la API
+function formatTime(date) {
+  const dateObj = new Date(date);
+  const options = { hour: "numeric", hour12: true };
+
+  return new Intl.DateTimeFormat("en-US", options).format(dateObj);
+}
+
 //Función para formatear la fecha que devuelve la API
-function formatDate(date, isShort) {
+function formatDate(date, mode) {
   const dateObj = new Date(date);
   let options;
 
-  if (isShort === true) {
-    options = { weekday: "short" };
+  if (mode === "short") {
+    options = { weekday: "short" }; // "Mon"
+  } else if (mode === "dayOnly") {
+    options = { weekday: "long" }; // Monday
   } else {
-    options = { weekday: "long", day: "numeric", month: "long" };
+    options = { weekday: "long", day: "numeric", month: "long" }; // "Monsay, March 16"
   }
 
   let dateFormatted = dateObj.toLocaleDateString("en-US", options);
-
   return dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
 }
 
