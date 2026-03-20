@@ -55,6 +55,8 @@ const searchFrom = document.querySelector(".search-form");
 const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
 const searchSuggestions = document.getElementById("search-suggestions");
+const searchError = document.getElementById("search-error");
+const weatherContent = document.getElementById("weather-content");
 searchFrom.addEventListener("submit", getLatAndLong);
 
 //Elementos tiempo actual
@@ -76,12 +78,12 @@ const daysDropdown = document.getElementById("days-dropdown");
 //Eventos abrir/cerrar menús desplegables
 searchInput.addEventListener("input", (event) => {
   const query = event.target.value.trim();
-
   clearTimeout(searchTimeout);
 
   if (query.length < 2) {
     searchSuggestions.innerHTML = "";
     searchSuggestions.classList.add("hidden");
+    searchError.classList.add("hidden");
     return;
   }
 
@@ -209,20 +211,34 @@ switchSystemBtn.addEventListener("click", () => {
 //Función para obtener la latitud y longitud de una ciudad, para luego utilizar estos datos para recoger los datos meteorológicos.
 async function getLatAndLong(event) {
   try {
-    //Evitar recargar la página
-    event.preventDefault();
+    event.preventDefault(); // Evitar recargar la página
     const cityName = searchInput.value.trim();
+
+    // Si el usuario le da a buscar con el input vacío, no hacemos nada
+    if (!cityName) return; 
 
     const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&language=es`;
     const geoResponse = await fetch(geoURL);
     const geoData = await geoResponse.json();
 
-    if (geoData.results && geoData.results.length) {
+    if (geoData.results && geoData.results.length > 0) {
+      searchError.classList.add("hidden"); // Ocultamos el mensaje de error
+      weatherContent.classList.remove("hidden"); // Mostramos toda la información del clima
+
       const currentLat = geoData.results[0].latitude;
       const currentLong = geoData.results[0].longitude;
       const currentCityName = geoData.results[0].name;
       const currentCountryName = geoData.results[0].country;
+      
       getWeather(currentLat, currentLong, currentCityName, currentCountryName);
+      
+      // Ocultamos la lista de sugerencias por si se quedó abierta
+      searchSuggestions.classList.add("hidden"); 
+
+    } else {
+      weatherContent.classList.add("hidden"); // Ocultamos todo el panel del clima
+      searchError.classList.remove("hidden"); // Mostramos el mensaje "No search result found!"
+      searchSuggestions.classList.add("hidden"); // Ocultamos sugerencias
     }
   } catch (error) {
     console.error("Error cargando la ciudad introducida:", error);
@@ -439,33 +455,32 @@ async function fetchSuggestions(query) {
     const response = await fetch(geoURL);
     const data = await response.json();
 
+    searchSuggestions.innerHTML = ""; 
+    searchError.classList.add("hidden"); // 1. Ocultamos el error de búsquedas pasadas
+
     if (data.results && data.results.length > 0) {
       data.results.forEach((city) => {
         const li = document.createElement("li");
         li.className = "suggestion-item";
-
-        let stateInfo = "";
-        if (city.admin1) {
-          stateInfo = `${city.admin1}, `;
-        }
-
+        const stateInfo = city.admin1 ? `${city.admin1}, ` : "";
         li.innerText = `${city.name}, ${stateInfo}${city.country}`;
 
         li.addEventListener("click", () => {
-          searchInput.value = city.name;
-          searchSuggestions.classList.add("hidden");
+          searchInput.value = city.name; 
+          searchSuggestions.classList.add("hidden"); 
           getWeather(city.latitude, city.longitude, city.name, city.country);
         });
 
         searchSuggestions.appendChild(li);
       });
-
-      searchSuggestions.classList.remove("hidden");
+      
+      searchSuggestions.classList.remove("hidden"); 
     } else {
+      // 2. Si no hay resultados, mostramos el texto de error
       searchSuggestions.classList.add("hidden");
     }
   } catch (error) {
-    console.error(error);
+    console.error("Error buscando sugerencias:", error);
   }
 }
 

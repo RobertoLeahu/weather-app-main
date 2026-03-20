@@ -93,280 +93,285 @@
                 class="suggestions-dropdown hidden"
               ></ul>
             </div>
-
             <button type="submit" id="search-button" class="btn-search">
               Search
             </button>
           </form>
+
+          <p id="search-error" class="search-error hidden">
+            No search result found!
+          </p>
         </section>
 
-        <div class="dashboard">
-          <div class="left-column">
-            <section class="current-weather">
-              <div class="location-date">
-                <h2 class="current-city" id="location">--</h2>
-                <p class="current-date" id="date">--</p>
-              </div>
-              <div class="display-temperatures">
-                <img
-                  id="current-weather"
-                  class="current-weather-icon"
-                  src="assets/images/icon-sunny.webp"
-                  alt="Sunny"
-                />
-                <p class="current-temperature-text" id="current-temperature">
-                  --
-                </p>
-              </div>
-            </section>
+        <div id="weather-content">
+          <div class="dashboard">
+            <div class="left-column">
+              <section class="current-weather">
+                <div class="location-date">
+                  <h2 class="current-city" id="location">--</h2>
+                  <p class="current-date" id="date">--</p>
+                </div>
+                <div class="display-temperatures">
+                  <img
+                    id="current-weather"
+                    class="current-weather-icon"
+                    src="assets/images/icon-sunny.webp"
+                    alt="Sunny"
+                  />
+                  <p class="current-temperature-text" id="current-temperature">
+                    --
+                  </p>
+                </div>
+              </section>
 
-            <section class="metric-weather">
-              <div class="metric-card">
-                <h3 class="metric-title">Feel like</h3>
-                <p id="feel-like" class="metric-value">--</p>
-              </div>
-              <div class="metric-card">
-                <h3 class="metric-title">Humidity</h3>
-                <p id="humidity" class="metric-value">--</p>
-              </div>
-              <div class="metric-card">
-                <h3 class="metric-title">Wind</h3>
-                <p id="wind" class="metric-value">--</p>
-              </div>
-              <div class="metric-card">
-                <h3 class="metric-title">Precipitation</h3>
-                <p id="precipitation" class="metric-value">--</p>
-              </div>
-            </section>
+              <section class="metric-weather">
+                <div class="metric-card">
+                  <h3 class="metric-title">Feel like</h3>
+                  <p id="feel-like" class="metric-value">--</p>
+                </div>
+                <div class="metric-card">
+                  <h3 class="metric-title">Humidity</h3>
+                  <p id="humidity" class="metric-value">--</p>
+                </div>
+                <div class="metric-card">
+                  <h3 class="metric-title">Wind</h3>
+                  <p id="wind" class="metric-value">--</p>
+                </div>
+                <div class="metric-card">
+                  <h3 class="metric-title">Precipitation</h3>
+                  <p id="precipitation" class="metric-value">--</p>
+                </div>
+              </section>
 
-            <section class="daily-forecast">
-              <h3 class="daily-title">Daily Forecast</h3>
-              <div class="day-cards-grid">
-                <div class="day-card">
-                  <h4 class="day-name">--</h4>
-                  <img
-                    class="day-icon"
-                    src="assets/images/icon-sunny.webp"
-                    alt=""
-                  />
-                  <div class="day-card-temperatures">
-                    <p class="high">--</p>
-                    <p class="low">--</p>
+              <section class="daily-forecast">
+                <h3 class="daily-title">Daily Forecast</h3>
+                <div class="day-cards-grid">
+                  <div class="day-card">
+                    <h4 class="day-name">--</h4>
+                    <img
+                      class="day-icon"
+                      src="assets/images/icon-sunny.webp"
+                      alt=""
+                    />
+                    <div class="day-card-temperatures">
+                      <p class="high">--</p>
+                      <p class="low">--</p>
+                    </div>
+                  </div>
+                  <div class="day-card">
+                    <h4 class="day-name">--</h4>
+                    <img
+                      class="day-icon"
+                      src="assets/images/icon-sunny.webp"
+                      alt=""
+                    />
+                    <div class="day-card-temperatures">
+                      <p class="high">--</p>
+                      <p class="low">--</p>
+                    </div>
+                  </div>
+                  <div class="day-card">
+                    <h4 class="day-name">--</h4>
+                    <img
+                      class="day-icon"
+                      src="assets/images/icon-sunny.webp"
+                      alt=""
+                    />
+                    <div class="day-card-temperatures">
+                      <p class="high">--</p>
+                      <p class="low">--</p>
+                    </div>
+                  </div>
+                  <div class="day-card">
+                    <h4 class="day-name">--</h4>
+                    <img
+                      class="day-icon"
+                      src="assets/images/icon-sunny.webp"
+                      alt=""
+                    />
+                    <div class="day-card-temperatures">
+                      <p class="high">--</p>
+                      <p class="low">--</p>
+                    </div>
+                  </div>
+                  <div class="day-card">
+                    <h4 class="day-name">--</h4>
+                    <img
+                      class="day-icon"
+                      src="assets/images/icon-sunny.webp"
+                      alt=""
+                    />
+                    <div class="day-card-temperatures">
+                      <p class="high">--</p>
+                      <p class="low">--</p>
+                    </div>
+                  </div>
+                  <div class="day-card">
+                    <h4 class="day-name">--</h4>
+                    <img
+                      class="day-icon"
+                      src="assets/images/icon-sunny.webp"
+                      alt=""
+                    />
+                    <div class="day-card-temperatures">
+                      <p class="high">--</p>
+                      <p class="low">--</p>
+                    </div>
+                  </div>
+                  <div class="day-card">
+                    <h4 class="day-name">--</h4>
+                    <img
+                      class="day-icon"
+                      src="assets/images/icon-sunny.webp"
+                      alt=""
+                    />
+                    <div class="day-card-temperatures">
+                      <p class="high">--</p>
+                      <p class="low">--</p>
+                    </div>
                   </div>
                 </div>
-                <div class="day-card">
-                  <h4 class="day-name">--</h4>
-                  <img
-                    class="day-icon"
-                    src="assets/images/icon-sunny.webp"
-                    alt=""
-                  />
-                  <div class="day-card-temperatures">
-                    <p class="high">--</p>
-                    <p class="low">--</p>
-                  </div>
-                </div>
-                <div class="day-card">
-                  <h4 class="day-name">--</h4>
-                  <img
-                    class="day-icon"
-                    src="assets/images/icon-sunny.webp"
-                    alt=""
-                  />
-                  <div class="day-card-temperatures">
-                    <p class="high">--</p>
-                    <p class="low">--</p>
-                  </div>
-                </div>
-                <div class="day-card">
-                  <h4 class="day-name">--</h4>
-                  <img
-                    class="day-icon"
-                    src="assets/images/icon-sunny.webp"
-                    alt=""
-                  />
-                  <div class="day-card-temperatures">
-                    <p class="high">--</p>
-                    <p class="low">--</p>
-                  </div>
-                </div>
-                <div class="day-card">
-                  <h4 class="day-name">--</h4>
-                  <img
-                    class="day-icon"
-                    src="assets/images/icon-sunny.webp"
-                    alt=""
-                  />
-                  <div class="day-card-temperatures">
-                    <p class="high">--</p>
-                    <p class="low">--</p>
-                  </div>
-                </div>
-                <div class="day-card">
-                  <h4 class="day-name">--</h4>
-                  <img
-                    class="day-icon"
-                    src="assets/images/icon-sunny.webp"
-                    alt=""
-                  />
-                  <div class="day-card-temperatures">
-                    <p class="high">--</p>
-                    <p class="low">--</p>
-                  </div>
-                </div>
-                <div class="day-card">
-                  <h4 class="day-name">--</h4>
-                  <img
-                    class="day-icon"
-                    src="assets/images/icon-sunny.webp"
-                    alt=""
-                  />
-                  <div class="day-card-temperatures">
-                    <p class="high">--</p>
-                    <p class="low">--</p>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
+              </section>
+            </div>
 
-          <div class="right-column">
-            <section class="hourly-forecast">
-              <div class="hourly-header">
-                <h3 class="hourly-title">Hourly forecast</h3>
+            <div class="right-column">
+              <section class="hourly-forecast">
+                <div class="hourly-header">
+                  <h3 class="hourly-title">Hourly forecast</h3>
 
-                <div class="dropdown-container">
-                  <button id="hourly-btn" class="hourly-btn">
-                    <span id="hourly-selected-day">--</span>
-                    <img
-                      class="dropdown-icon"
-                      src="assets/images/icon-dropdown.svg"
-                      alt=""
-                    />
-                  </button>
+                  <div class="dropdown-container">
+                    <button id="hourly-btn" class="hourly-btn">
+                      <span id="hourly-selected-day">--</span>
+                      <img
+                        class="dropdown-icon"
+                        src="assets/images/icon-dropdown.svg"
+                        alt=""
+                      />
+                    </button>
 
-                  <div
-                    id="days-dropdown"
-                    class="dropdown-menu days-dropdown hidden"
-                  >
-                    <button class="dropdown-item"></button>
-                    <button class="dropdown-item active"></button>
-                    <button class="dropdown-item"></button>
-                    <button class="dropdown-item"></button>
-                    <button class="dropdown-item"></button>
-                    <button class="dropdown-item"></button>
-                    <button class="dropdown-item"></button>
+                    <div
+                      id="days-dropdown"
+                      class="dropdown-menu days-dropdown hidden"
+                    >
+                      <button class="dropdown-item"></button>
+                      <button class="dropdown-item active"></button>
+                      <button class="dropdown-item"></button>
+                      <button class="dropdown-item"></button>
+                      <button class="dropdown-item"></button>
+                      <button class="dropdown-item"></button>
+                      <button class="dropdown-item"></button>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="hourly-list">
-                <div class="hourly-card">
-                  <div class="time-info">
-                    <img
-                      class="hourly-icon"
-                      src="assets/images/icon-sunny.webp"
-                      alt=""
-                    />
-                    <h4 class="hourly-time">--</h4>
+                <div class="hourly-list">
+                  <div class="hourly-card">
+                    <div class="time-info">
+                      <img
+                        class="hourly-icon"
+                        src="assets/images/icon-sunny.webp"
+                        alt=""
+                      />
+                      <h4 class="hourly-time">--</h4>
+                    </div>
+                    <div class="temp-info">
+                      <p class="high">--</p>
+                    </div>
                   </div>
-                  <div class="temp-info">
-                    <p class="high">--</p>
+                  <div class="hourly-card">
+                    <div class="time-info">
+                      <img
+                        class="hourly-icon"
+                        src="assets/images/icon-sunny.webp"
+                        alt=""
+                      />
+                      <h4 class="hourly-time">--</h4>
+                    </div>
+                    <div class="temp-info">
+                      <p class="high">--</p>
+                    </div>
+                  </div>
+                  <div class="hourly-card">
+                    <div class="time-info">
+                      <img
+                        class="hourly-icon"
+                        src="assets/images/icon-sunny.webp"
+                        alt=""
+                      />
+                      <h4 class="hourly-time">--</h4>
+                    </div>
+                    <div class="temp-info">
+                      <p class="high">--</p>
+                    </div>
+                  </div>
+                  <div class="hourly-card">
+                    <div class="time-info">
+                      <img
+                        class="hourly-icon"
+                        src="assets/images/icon-sunny.webp"
+                        alt=""
+                      />
+                      <h4 class="hourly-time">--</h4>
+                    </div>
+                    <div class="temp-info">
+                      <p class="high">--</p>
+                    </div>
+                  </div>
+                  <div class="hourly-card">
+                    <div class="time-info">
+                      <img
+                        class="hourly-icon"
+                        src="assets/images/icon-sunny.webp"
+                        alt=""
+                      />
+                      <h4 class="hourly-time">--</h4>
+                    </div>
+                    <div class="temp-info">
+                      <p class="high">--</p>
+                    </div>
+                  </div>
+                  <div class="hourly-card">
+                    <div class="time-info">
+                      <img
+                        class="hourly-icon"
+                        src="assets/images/icon-sunny.webp"
+                        alt=""
+                      />
+                      <h4 class="hourly-time">--</h4>
+                    </div>
+                    <div class="temp-info">
+                      <p class="high">--</p>
+                    </div>
+                  </div>
+                  <div class="hourly-card">
+                    <div class="time-info">
+                      <img
+                        class="hourly-icon"
+                        src="assets/images/icon-sunny.webp"
+                        alt=""
+                      />
+                      <h4 class="hourly-time">--</h4>
+                    </div>
+                    <div class="temp-info">
+                      <p class="high">--</p>
+                    </div>
+                  </div>
+                  <div class="hourly-card">
+                    <div class="time-info">
+                      <img
+                        class="hourly-icon"
+                        src="assets/images/icon-sunny.webp"
+                        alt=""
+                      />
+                      <h4 class="hourly-time">--</h4>
+                    </div>
+                    <div class="temp-info">
+                      <p class="high">--</p>
+                    </div>
                   </div>
                 </div>
-                <div class="hourly-card">
-                  <div class="time-info">
-                    <img
-                      class="hourly-icon"
-                      src="assets/images/icon-sunny.webp"
-                      alt=""
-                    />
-                    <h4 class="hourly-time">--</h4>
-                  </div>
-                  <div class="temp-info">
-                    <p class="high">--</p>
-                  </div>
-                </div>
-                <div class="hourly-card">
-                  <div class="time-info">
-                    <img
-                      class="hourly-icon"
-                      src="assets/images/icon-sunny.webp"
-                      alt=""
-                    />
-                    <h4 class="hourly-time">--</h4>
-                  </div>
-                  <div class="temp-info">
-                    <p class="high">--</p>
-                  </div>
-                </div>
-                <div class="hourly-card">
-                  <div class="time-info">
-                    <img
-                      class="hourly-icon"
-                      src="assets/images/icon-sunny.webp"
-                      alt=""
-                    />
-                    <h4 class="hourly-time">--</h4>
-                  </div>
-                  <div class="temp-info">
-                    <p class="high">--</p>
-                  </div>
-                </div>
-                <div class="hourly-card">
-                  <div class="time-info">
-                    <img
-                      class="hourly-icon"
-                      src="assets/images/icon-sunny.webp"
-                      alt=""
-                    />
-                    <h4 class="hourly-time">--</h4>
-                  </div>
-                  <div class="temp-info">
-                    <p class="high">--</p>
-                  </div>
-                </div>
-                <div class="hourly-card">
-                  <div class="time-info">
-                    <img
-                      class="hourly-icon"
-                      src="assets/images/icon-sunny.webp"
-                      alt=""
-                    />
-                    <h4 class="hourly-time">--</h4>
-                  </div>
-                  <div class="temp-info">
-                    <p class="high">--</p>
-                  </div>
-                </div>
-                <div class="hourly-card">
-                  <div class="time-info">
-                    <img
-                      class="hourly-icon"
-                      src="assets/images/icon-sunny.webp"
-                      alt=""
-                    />
-                    <h4 class="hourly-time">--</h4>
-                  </div>
-                  <div class="temp-info">
-                    <p class="high">--</p>
-                  </div>
-                </div>
-                <div class="hourly-card">
-                  <div class="time-info">
-                    <img
-                      class="hourly-icon"
-                      src="assets/images/icon-sunny.webp"
-                      alt=""
-                    />
-                    <h4 class="hourly-time">--</h4>
-                  </div>
-                  <div class="temp-info">
-                    <p class="high">--</p>
-                  </div>
-                </div>
-              </div>
-            </section>
+              </section>
+            </div>
           </div>
         </div>
       </div>
