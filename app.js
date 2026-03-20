@@ -40,6 +40,8 @@ const weatherCodeMap = {
 const DEFAULT_CITY = "Madrid";
 document.addEventListener("DOMContentLoaded", loadDefaultWeather(DEFAULT_CITY));
 
+let globalWeatherData = null;
+
 //Estado global en memoria de la app
 let currentLat, currentLong, currentCityName, currentCountryName;
 let tempUnit = "celsius";
@@ -48,9 +50,11 @@ let precipUnit = "mm";
 
 // -- ELEMENTOS DEL DOM --
 //Elementos buscador
+let searchTimeout;
 const searchFrom = document.querySelector(".search-form");
 const searchInput = document.getElementById("search-input");
 const searchButton = document.getElementById("search-button");
+const searchSuggestions = document.getElementById("search-suggestions");
 searchFrom.addEventListener("submit", getLatAndLong);
 
 //Elementos tiempo actual
@@ -70,6 +74,22 @@ const hourlyBtn = document.getElementById("hourly-btn");
 const daysDropdown = document.getElementById("days-dropdown");
 
 //Eventos abrir/cerrar menús desplegables
+searchInput.addEventListener("input", (event) => {
+  const query = event.target.value.trim();
+
+  clearTimeout(searchTimeout);
+
+  if (query.length < 2) {
+    searchSuggestions.innerHTML = "";
+    searchSuggestions.classList.add("hidden");
+    return;
+  }
+
+  searchTimeout = setTimeout(() => {
+    fetchSuggestions(query);
+  }, 300);
+});
+
 unitsBtn.addEventListener("click", () => {
   unitsDropdown.classList.toggle("hidden");
   daysDropdown.classList.add("hidden");
@@ -82,6 +102,13 @@ hourlyBtn.addEventListener("click", () => {
 
 //Cerrar menús al hacer clic fuera de ellos
 document.addEventListener("click", (event) => {
+  if (
+    !searchFrom.contains(event.target) &&
+    !searchSuggestions.contains(event.target)
+  ) {
+    searchSuggestions.classList.add("hidden");
+  }
+
   if (
     !unitsBtn.contains(event.target) &&
     !unitsDropdown.contains(event.target)
@@ -99,36 +126,32 @@ document.addEventListener("click", (event) => {
 
 // -- LÓGICA DE LOS BOTONES DE UNIDADES -
 // Seleccionamos todos los botones dentro del menú desplegable
-const unitButtons = document.querySelectorAll('#units-dropdown .dropdown-item');
+const unitButtons = document.querySelectorAll("#units-dropdown .dropdown-item");
 
-unitButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    
-    // 1. CAMBIO VISUAL (Mover la clase 'active')
-    // Buscamos la sección contenedora (ej: Temperatura) para no quitarle el 'active' a la sección de viento o de precipitación
-    const section = button.closest('.dropdown-section');
-    section.querySelectorAll('.dropdown-item').forEach(btn => btn.classList.remove('active'));
-    
+unitButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const section = button.closest(".dropdown-section");
+    section
+      .querySelectorAll(".dropdown-item")
+      .forEach((btn) => btn.classList.remove("active"));
+
     // Le ponemos el 'active' al botón que acabamos de pulsar
-    button.classList.add('active');
+    button.classList.add("active");
 
-    // 2. ACTUALIZAR LA MEMORIA GLOBAL
-    const selectedUnit = button.getAttribute('data-unit');
+    const selectedUnit = button.getAttribute("data-unit");
 
-    if (selectedUnit === 'celsius' || selectedUnit === 'fahrenheit') {
+    if (selectedUnit === "celsius" || selectedUnit === "fahrenheit") {
       tempUnit = selectedUnit;
-    } else if (selectedUnit === 'kmh' || selectedUnit === 'mph') {
+    } else if (selectedUnit === "kmh" || selectedUnit === "mph") {
       windUnit = selectedUnit;
-    } else if (selectedUnit === 'mm' || selectedUnit === 'inch') {
+    } else if (selectedUnit === "mm" || selectedUnit === "inch") {
       precipUnit = selectedUnit;
     }
 
-    // 3. RECARGAR LOS DATOS
-    // Si ya hay una ciudad cargada en la memoria, volvems a pedir los datos
     if (currentLat && currentLong) {
       getWeather(currentLat, currentLong, currentCityName, currentCountryName);
-      
-      unitsDropdown.classList.add('hidden'); 
+
+      unitsDropdown.classList.add("hidden");
     }
   });
 });
@@ -137,10 +160,8 @@ unitButtons.forEach(button => {
 const switchSystemBtn = document.getElementById("switch-system-btn");
 
 switchSystemBtn.addEventListener("click", () => {
-  // 1. Averiguar en qué sistema estamos (si la temperatura es celsius, asumimos Métrico)
   const isMetric = tempUnit === "celsius";
 
-  // 2. Cambiar todas las variables de golpe y el texto del botón
   if (isMetric) {
     // Pasar a Imperial
     tempUnit = "fahrenheit";
@@ -155,20 +176,21 @@ switchSystemBtn.addEventListener("click", () => {
     switchSystemBtn.innerText = "Switch to Imperial";
   }
 
-  // 3. Actualizamos visualmente los botones pequeños (los "checks")
   unitButtons.forEach((btn) => {
     const unit = btn.getAttribute("data-unit");
 
     if (tempUnit === "celsius" && windUnit === "kmh" && precipUnit === "mm") {
       switchSystemBtn.innerText = "Switch to Imperial";
-    } else if (tempUnit === "fahrenheit" && windUnit === "mph" && precipUnit === "inch") {
+    } else if (
+      tempUnit === "fahrenheit" &&
+      windUnit === "mph" &&
+      precipUnit === "inch"
+    ) {
       switchSystemBtn.innerText = "Switch to Metric";
     } else {
-      // Si hay una mezcla rara (ej: Celsius y mph), ponemos un texto neutro
-      switchSystemBtn.innerText = "Mixed System"; 
+      switchSystemBtn.innerText = "Mixed System";
     }
 
-    // Si el botón coincide con alguna de nuestras nuevas unidades, le ponemos 'active'
     if (unit === tempUnit || unit === windUnit || unit === precipUnit) {
       btn.classList.add("active");
     } else {
@@ -176,11 +198,9 @@ switchSystemBtn.addEventListener("click", () => {
     }
   });
 
-  // 4. Recargar los datos con la API
   if (currentLat && currentLong) {
     getWeather(currentLat, currentLong, currentCityName, currentCountryName);
-    
-    // Cerramos el menú para que la experiencia sea fluida
+
     unitsDropdown.classList.add("hidden");
   }
 });
@@ -220,6 +240,8 @@ async function getWeather(lat, long, cityName, countryName) {
     const weatherURL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&temperature_unit=${tempUnit}&wind_speed_unit=${windUnit}&precipitation_unit=${precipUnit}`;
     const weatherResponse = await fetch(weatherURL);
     const weatherData = await weatherResponse.json();
+    //Guardar los datos de la API
+    globalWeatherData = weatherData;
 
     if (weatherData.error) {
       console.error("La API devolvió un error:", weatherData.reason);
@@ -314,47 +336,73 @@ function updateDailyForecast(weatherData) {
 }
 
 // Función para actualizar el pronóstico por horas
-function updateHourlyForecast(weatherData) {
+function updateHourlyForecast(weatherData, targetDateString = null) {
   const currentData = weatherData.current;
   const hourlyData = weatherData.hourly;
-  const currentTimeString = currentData.time;
-  const currentHourString = currentTimeString.split(":")[0] + ":00";
-  console.log(currentData);
-  console.log(hourlyData);
+  const dailyData = weatherData.daily;
 
-  const day = formatDate(currentData.time, "dayOnly");
-  document.querySelector("#hourly-selected-day").innerText = day;
+  const dropdownButtons = document.querySelectorAll(
+    "#days-dropdown .dropdown-item",
+  );
 
-  const startIndex = hourlyData.time.indexOf(currentHourString);
+  dailyData.time.forEach((dateString, index) => {
+    if (dropdownButtons[index]) {
+      const btn = dropdownButtons[index];
+      const dayName = formatDate(dateString, "dayOnly");
 
-  if (startIndex === -1) {
-    console.error("No se encontró la hora actual en el pronóstico.");
-    return;
-  }
+      // El primer día siempre será "Today" (Hoy)
+      btn.innerText = index === 0 ? "Today" : dayName;
+
+      btn.classList.remove("active");
+
+      // Marcar visualmente el día seleccionado
+      if (
+        (!targetDateString && index === 0) ||
+        targetDateString === dateString
+      ) {
+        btn.classList.add("active");
+        document.querySelector("#hourly-selected-day").innerText =
+          btn.innerText;
+      }
+
+      btn.onclick = () => {
+        updateHourlyForecast(globalWeatherData, dateString);
+        document.getElementById("days-dropdown").classList.add("hidden");
+      };
+    }
+  });
+
+  let startIndex = 0;
+
+  const timeParts = currentData.time.split("T");
+  const currentHour = timeParts[1].split(":")[0];
+
+  const targetDate = targetDateString || dailyData.time[0];
+
+  const searchString = `${targetDate}T${currentHour}:00`;
+
+  startIndex = hourlyData.time.indexOf(searchString);
+
+  if (startIndex === -1) return;
 
   const hourlyList = document.querySelectorAll(".hourly-card");
+  const tempUnit = weatherData.hourly_units.temperature_2m;
 
   hourlyList.forEach((card, index) => {
-    //Indice de la hora + indice del contador
     let apiIndex = startIndex + index;
 
-    //Comprobar que existen datos
     if (hourlyData.time[apiIndex]) {
-      // Obtener código y actualizar imagen de clima
       const [condition, imagePath] = weatherCodeMap[
         hourlyData.weather_code[apiIndex]
       ] || ["Unknown", "assets/images/icon-partly-cloudy.webp"];
-
       card.querySelector(".hourly-icon").src = imagePath;
       card.querySelector(".hourly-icon").alt = condition;
 
-      // Actualizar hora
       const time = formatTime(hourlyData.time[apiIndex]);
       card.querySelector(".hourly-time").innerText = time;
 
-      // Actualizar la temperatura
       const temperature = Math.round(hourlyData.temperature_2m[apiIndex]);
-      card.querySelector(".high").innerText = `${temperature}º`;
+      card.querySelector(".high").innerText = `${temperature}${tempUnit}`;
     }
   });
 }
@@ -382,6 +430,43 @@ function formatDate(date, mode) {
 
   let dateFormatted = dateObj.toLocaleDateString("en-US", options);
   return dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
+}
+
+//Función para obtener y mostrar las sugerencias de ciudades
+async function fetchSuggestions(query) {
+  try {
+    const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=5&language=es`;
+    const response = await fetch(geoURL);
+    const data = await response.json();
+
+    if (data.results && data.results.length > 0) {
+      data.results.forEach((city) => {
+        const li = document.createElement("li");
+        li.className = "suggestion-item";
+
+        let stateInfo = "";
+        if (city.admin1) {
+          stateInfo = `${city.admin1}, `;
+        }
+
+        li.innerText = `${city.name}, ${stateInfo}${city.country}`;
+
+        li.addEventListener("click", () => {
+          searchInput.value = city.name;
+          searchSuggestions.classList.add("hidden");
+          getWeather(city.latitude, city.longitude, city.name, city.country);
+        });
+
+        searchSuggestions.appendChild(li);
+      });
+
+      searchSuggestions.classList.remove("hidden");
+    } else {
+      searchSuggestions.classList.add("hidden");
+    }
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 //Función para mostrar de manera predeterminada una ciudad al abrir la app

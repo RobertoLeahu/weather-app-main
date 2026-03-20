@@ -75,7 +75,7 @@
         <section class="search-section">
           <h1 class="search-title">How's the sky looking today?</h1>
           <form class="search-form">
-            <div class="input-group">
+            <div class="input-group" style="position: relative">
               <img
                 src="assets/images/icon-search.svg"
                 alt=""
@@ -86,8 +86,14 @@
                 id="search-input"
                 class="search-input-field"
                 placeholder="Search for a place..."
+                autocomplete="off"
               />
+              <ul
+                id="search-suggestions"
+                class="suggestions-dropdown hidden"
+              ></ul>
             </div>
+
             <button type="submit" id="search-button" class="btn-search">
               Search
             </button>
@@ -243,13 +249,13 @@
                     id="days-dropdown"
                     class="dropdown-menu days-dropdown hidden"
                   >
-                    <button class="dropdown-item">Monday</button>
-                    <button class="dropdown-item active">Tuesday</button>
-                    <button class="dropdown-item">Wednesday</button>
-                    <button class="dropdown-item">Thursday</button>
-                    <button class="dropdown-item">Friday</button>
-                    <button class="dropdown-item">Saturday</button>
-                    <button class="dropdown-item">Sunday</button>
+                    <button class="dropdown-item"></button>
+                    <button class="dropdown-item active"></button>
+                    <button class="dropdown-item"></button>
+                    <button class="dropdown-item"></button>
+                    <button class="dropdown-item"></button>
+                    <button class="dropdown-item"></button>
+                    <button class="dropdown-item"></button>
                   </div>
                 </div>
               </div>
