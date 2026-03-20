@@ -592,3 +592,55 @@ body {
   padding: 8px;
   gap: 4px;
 }
+
+/* --- ESTILOS PARA ERROR TÉCNICO DE API (Imagen de referencia) --- */
+.api-error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 60vh;
+}
+
+#api-error-content.hidden {
+  display: none;
+}
+
+.error-icon-wrapper {
+  margin-bottom: 24px;
+}
+
+.error-img {
+  width: 100px;
+}
+
+.error-main-title {
+  font-size: 2.5rem;
+  font-family: var(--font-secondary);
+  margin-bottom: 16px;
+}
+
+.error-description {
+  color: var(--neutral-300);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.btn-retry {
+  background-color: var(--neutral-700);
+  color: var(--neutral-0);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.btn-retry:hover {
+  background-color: var(--neutral-600);
+}

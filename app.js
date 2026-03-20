@@ -75,6 +75,17 @@ const unitsDropdown = document.getElementById("units-dropdown");
 const hourlyBtn = document.getElementById("hourly-btn");
 const daysDropdown = document.getElementById("days-dropdown");
 
+//Elementos mensaje de error de la API
+const apiErrorContent = document.getElementById("api-error-content");
+const apiErrorCode = document.getElementById("api-error-code");
+const searchSection = document.querySelector(".search-section");
+const retryBtn = document.getElementById("retry-btn");
+
+// Evento para el botón de "Retry" cuando la API da error
+retryBtn.addEventListener("click", () => {
+  location.reload();
+});
+
 //Eventos abrir/cerrar menús desplegables
 searchInput.addEventListener("input", (event) => {
   const query = event.target.value.trim();
@@ -211,64 +222,74 @@ switchSystemBtn.addEventListener("click", () => {
 //Función para obtener la latitud y longitud de una ciudad, para luego utilizar estos datos para recoger los datos meteorológicos.
 async function getLatAndLong(event) {
   try {
-    event.preventDefault(); // Evitar recargar la página
+    event.preventDefault();
     const cityName = searchInput.value.trim();
 
-    // Si el usuario le da a buscar con el input vacío, no hacemos nada
-    if (!cityName) return; 
+    // Si el usuario le da a buscar con el input vacío, no hace nada
+    if (!cityName) return;
 
     const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&language=es`;
     const geoResponse = await fetch(geoURL);
     const geoData = await geoResponse.json();
 
     if (geoData.results && geoData.results.length > 0) {
-      searchError.classList.add("hidden"); // Ocultamos el mensaje de error
-      weatherContent.classList.remove("hidden"); // Mostramos toda la información del clima
+      searchError.classList.add("hidden");
+      weatherContent.classList.remove("hidden");
 
       const currentLat = geoData.results[0].latitude;
       const currentLong = geoData.results[0].longitude;
       const currentCityName = geoData.results[0].name;
       const currentCountryName = geoData.results[0].country;
-      
-      getWeather(currentLat, currentLong, currentCityName, currentCountryName);
-      
-      // Ocultamos la lista de sugerencias por si se quedó abierta
-      searchSuggestions.classList.add("hidden"); 
 
+      getWeather(currentLat, currentLong, currentCityName, currentCountryName);
+
+      searchSuggestions.classList.add("hidden");
     } else {
-      weatherContent.classList.add("hidden"); // Ocultamos todo el panel del clima
-      searchError.classList.remove("hidden"); // Mostramos el mensaje "No search result found!"
-      searchSuggestions.classList.add("hidden"); // Ocultamos sugerencias
+      weatherContent.classList.add("hidden");
+      searchError.classList.remove("hidden");
+      searchSuggestions.classList.add("hidden");
     }
   } catch (error) {
     console.error("Error cargando la ciudad introducida:", error);
+    showApiError();
   }
 }
 
 //Función para recoger los datos meteorológicos necesarios usando la latitud y longitud.
 async function getWeather(lat, long, cityName, countryName) {
-  try {
-    currentLat = lat;
-    currentLong = long;
-    currentCityName = cityName;
-    currentCountryName = countryName;
+  currentLat = lat;
+  currentLong = long;
+  currentCityName = cityName;
+  currentCountryName = countryName;
 
-    const weatherURL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&temperature_unit=${tempUnit}&wind_speed_unit=${windUnit}&precipitation_unit=${precipUnit}`;
+  const weatherURL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&temperature_unit=${tempUnit}&wind_speed_unit=${windUnit}&precipitation_unit=${precipUnit}`;
+
+  try {
     const weatherResponse = await fetch(weatherURL);
+
+    if (!weatherResponse.ok) {
+      throw new Error(`Server Response: ${weatherResponse.status}`);
+    }
+
     const weatherData = await weatherResponse.json();
-    //Guardar los datos de la API
+
     globalWeatherData = weatherData;
 
     if (weatherData.error) {
-      console.error("La API devolvió un error:", weatherData.reason);
-      return;
+      throw new Error(`API Validation Error: ${weatherData.reason}`);
     }
 
-    if (weatherData.current && weatherData.daily) {
-      updateUI(weatherData, cityName, countryName);
-    }
+    searchError.classList.add("hidden");
+    apiErrorContent.classList.add("hidden");
+    weatherContent.classList.remove("hidden");
+
+    updateCurrentWeather(weatherData, cityName, countryName);
+    updateMetrics(weatherData);
+    updateDailyForecast(weatherData);
+    updateHourlyForecast(weatherData);
   } catch (error) {
-    console.error(`Error cargando los datos de ${cityName}`, error);
+    console.error("Critical error fetching weather data:", error);
+    showApiError();
   }
 }
 
@@ -392,9 +413,7 @@ function updateHourlyForecast(weatherData, targetDateString = null) {
 
   const timeParts = currentData.time.split("T");
   const currentHour = timeParts[1].split(":")[0];
-
   const targetDate = targetDateString || dailyData.time[0];
-
   const searchString = `${targetDate}T${currentHour}:00`;
 
   startIndex = hourlyData.time.indexOf(searchString);
@@ -455,8 +474,8 @@ async function fetchSuggestions(query) {
     const response = await fetch(geoURL);
     const data = await response.json();
 
-    searchSuggestions.innerHTML = ""; 
-    searchError.classList.add("hidden"); // 1. Ocultamos el error de búsquedas pasadas
+    searchSuggestions.innerHTML = "";
+    searchError.classList.add("hidden");
 
     if (data.results && data.results.length > 0) {
       data.results.forEach((city) => {
@@ -466,15 +485,15 @@ async function fetchSuggestions(query) {
         li.innerText = `${city.name}, ${stateInfo}${city.country}`;
 
         li.addEventListener("click", () => {
-          searchInput.value = city.name; 
-          searchSuggestions.classList.add("hidden"); 
+          searchInput.value = city.name;
+          searchSuggestions.classList.add("hidden");
           getWeather(city.latitude, city.longitude, city.name, city.country);
         });
 
         searchSuggestions.appendChild(li);
       });
-      
-      searchSuggestions.classList.remove("hidden"); 
+
+      searchSuggestions.classList.remove("hidden");
     } else {
       // 2. Si no hay resultados, mostramos el texto de error
       searchSuggestions.classList.add("hidden");
@@ -482,6 +501,13 @@ async function fetchSuggestions(query) {
   } catch (error) {
     console.error("Error buscando sugerencias:", error);
   }
+}
+
+// Función que apaga la web y muestra el error
+function showApiError() {
+  searchSection.classList.add("hidden");
+  weatherContent.classList.add("hidden");
+  apiErrorContent.classList.remove("hidden");
 }
 
 //Función para mostrar de manera predeterminada una ciudad al abrir la app
@@ -500,5 +526,6 @@ async function loadDefaultWeather(cityName) {
     }
   } catch (error) {
     console.error("Error cargando ciudad por defecto:", error);
+    showApiError();
   }
 }
