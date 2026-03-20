@@ -40,6 +40,12 @@ const weatherCodeMap = {
 const DEFAULT_CITY = "Madrid";
 document.addEventListener("DOMContentLoaded", loadDefaultWeather(DEFAULT_CITY));
 
+//Estado global en memoria de la app
+let currentLat, currentLong, currentCityName, currentCountryName;
+let tempUnit = "celsius";
+let windUnit = "kmh";
+let precipUnit = "mm";
+
 // -- ELEMENTOS DEL DOM --
 //Elementos buscador
 const searchFrom = document.querySelector(".search-form");
@@ -56,6 +62,128 @@ const feelLikeDisplay = document.getElementById("feel-like");
 const humidityDsiplay = document.getElementById("humidity");
 const windDisplay = document.getElementById("wind");
 const precipitationDisplay = document.getElementById("precipitation");
+
+//Elementos de los desplegables
+const unitsBtn = document.getElementById("units-btn");
+const unitsDropdown = document.getElementById("units-dropdown");
+const hourlyBtn = document.getElementById("hourly-btn");
+const daysDropdown = document.getElementById("days-dropdown");
+
+//Eventos abrir/cerrar menús desplegables
+unitsBtn.addEventListener("click", () => {
+  unitsDropdown.classList.toggle("hidden");
+  daysDropdown.classList.add("hidden");
+});
+
+hourlyBtn.addEventListener("click", () => {
+  daysDropdown.classList.toggle("hidden");
+  unitsDropdown.classList.add("hidden");
+});
+
+//Cerrar menús al hacer clic fuera de ellos
+document.addEventListener("click", (event) => {
+  if (
+    !unitsBtn.contains(event.target) &&
+    !unitsDropdown.contains(event.target)
+  ) {
+    unitsDropdown.classList.add("hidden");
+  }
+
+  if (
+    !hourlyBtn.contains(event.target) &&
+    !daysDropdown.contains(event.target)
+  ) {
+    daysDropdown.classList.add("hidden");
+  }
+});
+
+// -- LÓGICA DE LOS BOTONES DE UNIDADES -
+// Seleccionamos todos los botones dentro del menú desplegable
+const unitButtons = document.querySelectorAll('#units-dropdown .dropdown-item');
+
+unitButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    
+    // 1. CAMBIO VISUAL (Mover la clase 'active')
+    // Buscamos la sección contenedora (ej: Temperatura) para no quitarle el 'active' a la sección de viento o de precipitación
+    const section = button.closest('.dropdown-section');
+    section.querySelectorAll('.dropdown-item').forEach(btn => btn.classList.remove('active'));
+    
+    // Le ponemos el 'active' al botón que acabamos de pulsar
+    button.classList.add('active');
+
+    // 2. ACTUALIZAR LA MEMORIA GLOBAL
+    const selectedUnit = button.getAttribute('data-unit');
+
+    if (selectedUnit === 'celsius' || selectedUnit === 'fahrenheit') {
+      tempUnit = selectedUnit;
+    } else if (selectedUnit === 'kmh' || selectedUnit === 'mph') {
+      windUnit = selectedUnit;
+    } else if (selectedUnit === 'mm' || selectedUnit === 'inch') {
+      precipUnit = selectedUnit;
+    }
+
+    // 3. RECARGAR LOS DATOS
+    // Si ya hay una ciudad cargada en la memoria, volvems a pedir los datos
+    if (currentLat && currentLong) {
+      getWeather(currentLat, currentLong, currentCityName, currentCountryName);
+      
+      unitsDropdown.classList.add('hidden'); 
+    }
+  });
+});
+
+// -- LÓGICA DEL BOTÓN Switch to Imperial / Metric --
+const switchSystemBtn = document.getElementById("switch-system-btn");
+
+switchSystemBtn.addEventListener("click", () => {
+  // 1. Averiguar en qué sistema estamos (si la temperatura es celsius, asumimos Métrico)
+  const isMetric = tempUnit === "celsius";
+
+  // 2. Cambiar todas las variables de golpe y el texto del botón
+  if (isMetric) {
+    // Pasar a Imperial
+    tempUnit = "fahrenheit";
+    windUnit = "mph";
+    precipUnit = "inch";
+    switchSystemBtn.innerText = "Switch to Metric";
+  } else {
+    // Pasar a Métrico
+    tempUnit = "celsius";
+    windUnit = "kmh";
+    precipUnit = "mm";
+    switchSystemBtn.innerText = "Switch to Imperial";
+  }
+
+  // 3. Actualizamos visualmente los botones pequeños (los "checks")
+  unitButtons.forEach((btn) => {
+    const unit = btn.getAttribute("data-unit");
+
+    if (tempUnit === "celsius" && windUnit === "kmh" && precipUnit === "mm") {
+      switchSystemBtn.innerText = "Switch to Imperial";
+    } else if (tempUnit === "fahrenheit" && windUnit === "mph" && precipUnit === "inch") {
+      switchSystemBtn.innerText = "Switch to Metric";
+    } else {
+      // Si hay una mezcla rara (ej: Celsius y mph), ponemos un texto neutro
+      switchSystemBtn.innerText = "Mixed System"; 
+    }
+
+    // Si el botón coincide con alguna de nuestras nuevas unidades, le ponemos 'active'
+    if (unit === tempUnit || unit === windUnit || unit === precipUnit) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+
+  // 4. Recargar los datos con la API
+  if (currentLat && currentLong) {
+    getWeather(currentLat, currentLong, currentCityName, currentCountryName);
+    
+    // Cerramos el menú para que la experiencia sea fluida
+    unitsDropdown.classList.add("hidden");
+  }
+});
 
 // -- LÓGICA DE LA API --
 //Función para obtener la latitud y longitud de una ciudad, para luego utilizar estos datos para recoger los datos meteorológicos.
@@ -84,9 +212,19 @@ async function getLatAndLong(event) {
 //Función para recoger los datos meteorológicos necesarios usando la latitud y longitud.
 async function getWeather(lat, long, cityName, countryName) {
   try {
-    const weatherURL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
+    currentLat = lat;
+    currentLong = long;
+    currentCityName = cityName;
+    currentCountryName = countryName;
+
+    const weatherURL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&temperature_unit=${tempUnit}&wind_speed_unit=${windUnit}&precipitation_unit=${precipUnit}`;
     const weatherResponse = await fetch(weatherURL);
     const weatherData = await weatherResponse.json();
+
+    if (weatherData.error) {
+      console.error("La API devolvió un error:", weatherData.reason);
+      return;
+    }
 
     if (weatherData.current && weatherData.daily) {
       updateUI(weatherData, cityName, countryName);
@@ -140,10 +278,12 @@ function updateMetrics(weatherData) {
   humidityDsiplay.innerText = `${relative_humidity_2m}%`;
   //Actualizar viento
   const wind_speed_10m = weatherData.current.wind_speed_10m;
-  windDisplay.innerText = `${wind_speed_10m} km/h`;
+  const windUnit = weatherData.current_units.wind_speed_10m;
+  windDisplay.innerText = `${wind_speed_10m} ${windUnit}`;
   //Actualizar precipitación
-  const precipitación = weatherData.current.precipitation;
-  precipitationDisplay.innerText = `${precipitación} mm`;
+  const precipitacion = weatherData.current.precipitation;
+  const precipUnit = weatherData.current_units.precipitation;
+  precipitationDisplay.innerText = `${precipitacion} ${precipUnit}`;
 }
 
 //Función para actualizar el clima diario
@@ -237,7 +377,7 @@ function formatDate(date, mode) {
   } else if (mode === "dayOnly") {
     options = { weekday: "long" }; // Monday
   } else {
-    options = { weekday: "long", day: "numeric", month: "long" }; // "Monsay, March 16"
+    options = { weekday: "long", day: "numeric", month: "long" }; // "Monday, March 16"
   }
 
   let dateFormatted = dateObj.toLocaleDateString("en-US", options);

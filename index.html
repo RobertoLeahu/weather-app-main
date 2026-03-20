@@ -32,6 +32,42 @@
               alt=""
             />
           </button>
+
+          <div id="units-dropdown" class="dropdown-menu hidden">
+            <button class="dropdown-main-btn" id="switch-system-btn">
+              Switch to Imperial
+            </button>
+
+            <div class="dropdown-section">
+              <p class="dropdown-label">Temperature</p>
+              <button class="dropdown-item active" data-unit="celsius">
+                Celsius (°C) <span class="check">✓</span>
+              </button>
+              <button class="dropdown-item" data-unit="fahrenheit">
+                Fahrenheit (°F) <span class="check">✓</span>
+              </button>
+            </div>
+
+            <div class="dropdown-section">
+              <p class="dropdown-label">Wind Speed</p>
+              <button class="dropdown-item active" data-unit="kmh">
+                km/h <span class="check">✓</span>
+              </button>
+              <button class="dropdown-item" data-unit="mph">
+                mph <span class="check">✓</span>
+              </button>
+            </div>
+
+            <div class="dropdown-section">
+              <p class="dropdown-label">Precipitation</p>
+              <button class="dropdown-item active" data-unit="mm">
+                Millimeters (mm) <span class="check">✓</span>
+              </button>
+              <button class="dropdown-item" data-unit="inch">
+                Inches (in) <span class="check">✓</span>
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -202,6 +238,19 @@
                       alt=""
                     />
                   </button>
+
+                  <div
+                    id="days-dropdown"
+                    class="dropdown-menu days-dropdown hidden"
+                  >
+                    <button class="dropdown-item">Monday</button>
+                    <button class="dropdown-item active">Tuesday</button>
+                    <button class="dropdown-item">Wednesday</button>
+                    <button class="dropdown-item">Thursday</button>
+                    <button class="dropdown-item">Friday</button>
+                    <button class="dropdown-item">Saturday</button>
+                    <button class="dropdown-item">Sunday</button>
+                  </div>
                 </div>
               </div>
 
