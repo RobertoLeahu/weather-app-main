@@ -600,7 +600,6 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  height: 60vh;
 }
 
 #api-error-content.hidden {

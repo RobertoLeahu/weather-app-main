@@ -503,13 +503,6 @@ async function fetchSuggestions(query) {
   }
 }
 
-// Función que apaga la web y muestra el error
-function showApiError() {
-  searchSection.classList.add("hidden");
-  weatherContent.classList.add("hidden");
-  apiErrorContent.classList.remove("hidden");
-}
-
 //Función para mostrar de manera predeterminada una ciudad al abrir la app
 async function loadDefaultWeather(cityName) {
   try {
@@ -528,4 +521,11 @@ async function loadDefaultWeather(cityName) {
     console.error("Error cargando ciudad por defecto:", error);
     showApiError();
   }
+}
+
+// Función que apaga la web y muestra el error
+function showApiError() {
+  searchSection.classList.add("hidden");
+  weatherContent.classList.add("hidden");
+  apiErrorContent.classList.remove("hidden");
 }
