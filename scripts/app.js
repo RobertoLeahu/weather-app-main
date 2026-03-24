@@ -44,9 +44,9 @@ let globalWeatherData = null;
 
 //Estado global en memoria de la app
 let currentLat, currentLong, currentCityName, currentCountryName;
-let tempUnit = "celsius";
-let windUnit = "kmh";
-let precipUnit = "mm";
+let tempUnit = localStorage.getItem("tempUnit") || "celsius";
+let windUnit = localStorage.getItem("windUnit") || "kmh";
+let precipUnit = localStorage.getItem("precipUnit") || "mm";
 
 // -- ELEMENTOS DEL DOM --
 //Elementos buscador
@@ -155,10 +155,13 @@ unitButtons.forEach((button) => {
 
     if (selectedUnit === "celsius" || selectedUnit === "fahrenheit") {
       tempUnit = selectedUnit;
+      localStorage.setItem("tempUnit", tempUnit);
     } else if (selectedUnit === "kmh" || selectedUnit === "mph") {
       windUnit = selectedUnit;
+      localStorage.setItem("windUnit", windUnit);
     } else if (selectedUnit === "mm" || selectedUnit === "inch") {
       precipUnit = selectedUnit;
+      localStorage.setItem("precipUnit", precipUnit);
     }
 
     if (currentLat && currentLong) {
@@ -188,6 +191,11 @@ switchSystemBtn.addEventListener("click", () => {
     precipUnit = "mm";
     switchSystemBtn.innerText = "Switch to Imperial";
   }
+
+  //Guardar datos en LocalStorage
+  localStorage.setItem("tempUnit", tempUnit);
+  localStorage.setItem("windUnit", windUnit);
+  localStorage.setItem("precipUnit", precipUnit);
 
   unitButtons.forEach((btn) => {
     const unit = btn.getAttribute("data-unit");
@@ -299,6 +307,27 @@ function updateUI(weatherData, cityName, countryName) {
   updateMetrics(weatherData);
   updateDailyForecast(weatherData);
   updateHourlyForecast(weatherData);
+}
+
+//Función para aplicar las clases 'active' correctas al cargar la página
+function syncUnitsUI() {
+  unitButtons.forEach((btn) => {
+    const unit = btn.getAttribute("data-unit");
+    if (unit === tempUnit || unit === windUnit || unit === precipUnit) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+
+  //Actualizar el texto del botón principal según lo que haya guardado
+  if (tempUnit === "celsius" && windUnit === "kmh" && precipUnit === "mm") {
+    switchSystemBtn.innerText = "Switch to Imperial";
+  } else if (tempUnit === "fahrenheit" && windUnit === "mph" && precipUnit === "inch") {
+    switchSystemBtn.innerText = "Switch to Metric";
+  } else {
+    switchSystemBtn.innerText = "Mixed System";
+  }
 }
 
 //Función para actualizar los datos del clima actual
@@ -446,10 +475,8 @@ function updateHourlyForecast(weatherData, targetDateString = null) {
 function formatTime(date) {
   const dateObj = new Date(date);
 
-  // Definimos la región: 'es-ES' para español, 'en-US' para inglés
   const locale = currentLang === "es" ? "es-ES" : "en-US";
 
-  // En inglés usamos AM/PM (hour12: true), en español usamos 24h (hour12: false)
   const options = {
     hour: "numeric",
     hour12: currentLang === "en",
@@ -471,11 +498,9 @@ function formatDate(date, mode) {
     options = { weekday: "long", day: "numeric", month: "long" }; // "Monday, March 16" o "lunes, 16 de marzo"
   }
 
-  // Definimos la región según el idioma actual
   const locale = currentLang === "es" ? "es-ES" : "en-US";
   let dateFormatted = dateObj.toLocaleDateString(locale, options);
 
-  // Capitalizamos la primera letra
   return dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
 }
 
@@ -534,8 +559,9 @@ async function loadDefaultWeather(cityName) {
   }
 }
 
-// Reconocer ubicación del usuario.
+// Función inicialización de la app / reconocer ubicación del usuario
 function initApp() {
+  syncUnitsUI();
   if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
