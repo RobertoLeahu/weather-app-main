@@ -38,7 +38,7 @@ const weatherCodeMap = {
 
 //Ciudad predeterminada al abrir la app
 const DEFAULT_CITY = "Madrid";
-document.addEventListener("DOMContentLoaded", loadDefaultWeather(DEFAULT_CITY));
+document.addEventListener("DOMContentLoaded", initApp);
 
 let globalWeatherData = null;
 
@@ -523,7 +523,49 @@ async function loadDefaultWeather(cityName) {
   }
 }
 
-// Función que apaga la web y muestra el error
+// Reconocer ubicación del usuario.
+function initApp() {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const long = position.coords.longitude;
+
+        try {
+          const reverseGeoURL = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${long}`;
+          const response = await fetch(reverseGeoURL);
+          const data = await response.json();
+
+          const cityName =
+            data.address.city ||
+            data.address.town ||
+            data.address.village ||
+            "Tu ubicación";
+          const countryName = data.address.country || "";
+
+          getWeather(lat, long, cityName, countryName);
+        } catch (error) {
+          console.error("Error al obtener el nombre de la ubicación:", error);
+          getWeather(lat, long, "Tu ubicación actual", "");
+        }
+      },
+      (error) => {
+        console.warn(
+          `Error de Geolocalización (Código ${error.code}): ${error.message}`,
+        );
+        console.warn("Cargando ciudad por defecto...");
+        loadDefaultWeather(DEFAULT_CITY);
+      },
+    );
+  } else {
+    console.warn(
+      "Geolocalización no soportada por el navegador. Cargando ciudad por defecto.",
+    );
+    loadDefaultWeather(DEFAULT_CITY);
+  }
+}
+
+// Función mostrar error de conexión a la API
 function showApiError() {
   searchSection.classList.add("hidden");
   weatherContent.classList.add("hidden");
