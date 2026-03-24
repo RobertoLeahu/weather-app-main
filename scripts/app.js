@@ -43,6 +43,24 @@ const predefinedCities = [
   { name: "Tokyo", country: "Japan", lat: 35.6895, long: 139.6917 },
   { name: "London", country: "United Kingdom", lat: 51.5085, long: -0.1257 },
   { name: "Paris", country: "France", lat: 48.8534, long: 2.3488 },
+  { name: "Rome", country: "Italy", lat: 41.9028, long: 12.4964 },
+  { name: "Berlin", country: "Germany", lat: 52.52, long: 13.405 },
+  { name: "Sydney", country: "Australia", lat: -33.8688, long: 151.2093 },
+  { name: "Buenos Aires", country: "Argentina", lat: -34.6037, long: -58.3816 },
+  { name: "Mexico City", country: "Mexico", lat: 19.4326, long: -99.1332 },
+  { name: "Bogotá", country: "Colombia", lat: 4.711, long: -74.0721 },
+  { name: "Cairo", country: "Egypt", lat: 30.0444, long: 31.2357 },
+  { name: "Beijing", country: "China", lat: 39.9042, long: 116.4074 },
+  { name: "Seoul", country: "South Korea", lat: 37.5665, long: 126.978 },
+  { name: "Toronto", country: "Canada", lat: 43.651, long: -79.347 },
+  { name: "Rio de Janeiro", country: "Brazil", lat: -22.9068, long: -43.1729 },
+  {
+    name: "Dubai",
+    country: "United Arab Emirates",
+    lat: 25.2048,
+    long: 55.2708,
+  },
+  { name: "Mumbai", country: "India", lat: 19.076, long: 72.8777 },
 ];
 
 //Iniciar app
@@ -464,12 +482,10 @@ function updateHourlyForecast(weatherData, targetDateString = null) {
       const btn = dropdownButtons[index];
       const dayName = formatDate(dateString, "dayOnly");
 
-      // El primer día siempre será "Today" (Hoy)
       btn.innerText = index === 0 ? translations[currentLang].today : dayName;
 
       btn.classList.remove("active");
 
-      // Marcar visualmente el día seleccionado
       if (
         (!targetDateString && index === 0) ||
         targetDateString === dateString
@@ -608,20 +624,35 @@ async function loadDefaultWeather(cityName) {
   }
 }
 
+//Función para sugerir 5 ciudades aleatorias
 function renderDefaultSuggestions() {
   suggestedCitiesList.innerHTML = "";
-  predefinedCities.forEach((city) => {
+
+  const randomCities = [...predefinedCities]
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 5);
+
+  randomCities.forEach((city) => {
     const btn = document.createElement("button");
     btn.className = "suggested-city-btn";
     btn.innerText = city.name;
+
     btn.addEventListener("click", () => {
       searchInput.value = city.name;
       clearBtn.classList.remove("hidden");
       defaultSuggestionsContainer.classList.add("hidden");
       getWeather(city.lat, city.long, city.name, city.country);
     });
+
     suggestedCitiesList.appendChild(btn);
   });
+}
+
+// Función mostrar error de conexión a la API
+function showApiError() {
+  searchSection.classList.add("hidden");
+  weatherContent.classList.add("hidden");
+  apiErrorContent.classList.remove("hidden");
 }
 
 // Función inicialización de la app / reconocer ubicación del usuario
@@ -663,11 +694,4 @@ function initApp() {
   } else {
     getWeather(40.4165, -3.7026, "Madrid", "Spain");
   }
-}
-
-// Función mostrar error de conexión a la API
-function showApiError() {
-  searchSection.classList.add("hidden");
-  weatherContent.classList.add("hidden");
-  apiErrorContent.classList.remove("hidden");
 }
