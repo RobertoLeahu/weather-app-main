@@ -228,7 +228,7 @@ async function getLatAndLong(event) {
     // Si el usuario le da a buscar con el input vacío, no hace nada
     if (!cityName) return;
 
-    const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&language=es`;
+    const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&language=${currentLang}`;
     const geoResponse = await fetch(geoURL);
     const geoData = await geoResponse.json();
 
@@ -388,7 +388,7 @@ function updateHourlyForecast(weatherData, targetDateString = null) {
       const dayName = formatDate(dateString, "dayOnly");
 
       // El primer día siempre será "Today" (Hoy)
-      btn.innerText = index === 0 ? "Today" : dayName;
+      btn.innerText = index === 0 ? translations[currentLang].today : dayName;
 
       btn.classList.remove("active");
 
@@ -445,32 +445,44 @@ function updateHourlyForecast(weatherData, targetDateString = null) {
 //Función para formatear la hora que devuelve la API
 function formatTime(date) {
   const dateObj = new Date(date);
-  const options = { hour: "numeric", hour12: true };
 
-  return new Intl.DateTimeFormat("en-US", options).format(dateObj);
+  // Definimos la región: 'es-ES' para español, 'en-US' para inglés
+  const locale = currentLang === "es" ? "es-ES" : "en-US";
+
+  // En inglés usamos AM/PM (hour12: true), en español usamos 24h (hour12: false)
+  const options = {
+    hour: "numeric",
+    hour12: currentLang === "en",
+  };
+
+  return new Intl.DateTimeFormat(locale, options).format(dateObj);
 }
 
-//Función para formatear la fecha que devuelve la API
+// Función para formatear la fecha (Dinámica según el idioma)
 function formatDate(date, mode) {
   const dateObj = new Date(date);
   let options;
 
   if (mode === "short") {
-    options = { weekday: "short" }; // "Mon"
+    options = { weekday: "short" }; // "Mon" o "lun"
   } else if (mode === "dayOnly") {
-    options = { weekday: "long" }; // Monday
+    options = { weekday: "long" }; // "Monday" o "lunes"
   } else {
-    options = { weekday: "long", day: "numeric", month: "long" }; // "Monday, March 16"
+    options = { weekday: "long", day: "numeric", month: "long" }; // "Monday, March 16" o "lunes, 16 de marzo"
   }
 
-  let dateFormatted = dateObj.toLocaleDateString("en-US", options);
+  // Definimos la región según el idioma actual
+  const locale = currentLang === "es" ? "es-ES" : "en-US";
+  let dateFormatted = dateObj.toLocaleDateString(locale, options);
+
+  // Capitalizamos la primera letra
   return dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
 }
 
 //Función para obtener y mostrar las sugerencias de ciudades
 async function fetchSuggestions(query) {
   try {
-    const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=5&language=es`;
+    const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&language=${currentLang}`;
     const response = await fetch(geoURL);
     const data = await response.json();
 
@@ -495,7 +507,6 @@ async function fetchSuggestions(query) {
 
       searchSuggestions.classList.remove("hidden");
     } else {
-      // 2. Si no hay resultados, mostramos el texto de error
       searchSuggestions.classList.add("hidden");
     }
   } catch (error) {

@@ -11,7 +11,7 @@
       href="./assets/images/favicon-32x32.png"
     />
 
-    <title>Weather app</title>
+    <title data-i18n="app_title">Weather app</title>
 
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -22,50 +22,105 @@
           <img class="logo-img" src="assets/images/logo.svg" alt="Logo" />
         </div>
 
-        <div class="units-toggle">
-          <button id="units-btn" class="units-btn">
-            <img class="units-icon" src="assets/images/icon-units.svg" alt="" />
-            Units
-            <img
-              class="dropdown-icon"
-              src="assets/images/icon-dropdown.svg"
-              alt=""
-            />
-          </button>
-
-          <div id="units-dropdown" class="dropdown-menu hidden">
-            <button class="dropdown-main-btn" id="switch-system-btn">
-              Switch to Imperial
+        <div class="dropdown-buttons">
+          <div
+            class="lang-toggle"
+            style="position: relative; margin-right: 15px"
+          >
+            <button id="lang-btn" class="units-btn">
+              <span id="current-lang-text">EN</span>
+              <img
+                class="dropdown-icon"
+                src="assets/images/icon-dropdown.svg"
+                alt=""
+              />
             </button>
 
-            <div class="dropdown-section">
-              <p class="dropdown-label">Temperature</p>
-              <button class="dropdown-item active" data-unit="celsius">
-                Celsius (°C) <span class="check">✓</span>
-              </button>
-              <button class="dropdown-item" data-unit="fahrenheit">
-                Fahrenheit (°F) <span class="check">✓</span>
-              </button>
+            <div id="lang-dropdown" class="dropdown-menu hidden">
+              <div class="dropdown-section">
+                <button
+                  class="dropdown-item lang-item active"
+                  data-lang="en"
+                  data-i18n="lang_en"
+                >
+                  English
+                </button>
+                <button
+                  class="dropdown-item lang-item"
+                  data-lang="es"
+                  data-i18n="lang_es"
+                >
+                  Español
+                </button>
+              </div>
             </div>
+          </div>
 
-            <div class="dropdown-section">
-              <p class="dropdown-label">Wind Speed</p>
-              <button class="dropdown-item active" data-unit="kmh">
-                km/h <span class="check">✓</span>
-              </button>
-              <button class="dropdown-item" data-unit="mph">
-                mph <span class="check">✓</span>
-              </button>
-            </div>
+          <div class="units-toggle">
+            <button id="units-btn" class="units-btn">
+              <img
+                class="units-icon"
+                src="assets/images/icon-units.svg"
+                alt=""
+              />
+              <span data-i18n="units_button">Units</span>
+              <img
+                class="dropdown-icon"
+                src="assets/images/icon-dropdown.svg"
+                alt=""
+              />
+            </button>
 
-            <div class="dropdown-section">
-              <p class="dropdown-label">Precipitation</p>
-              <button class="dropdown-item active" data-unit="mm">
-                Millimeters (mm) <span class="check">✓</span>
+            <div id="units-dropdown" class="dropdown-menu hidden">
+              <button
+                class="dropdown-main-btn"
+                id="switch-system-btn"
+                data-i18n="switch_imperial"
+              >
+                Switch to Imperial
               </button>
-              <button class="dropdown-item" data-unit="inch">
-                Inches (in) <span class="check">✓</span>
-              </button>
+
+              <div class="dropdown-section">
+                <p class="dropdown-label" data-i18n="label_temperature">
+                  Temperature
+                </p>
+                <button class="dropdown-item active" data-unit="celsius">
+                  <span data-i18n="unit_celsius">Celsius (°C)</span>
+                  <span class="check">✓</span>
+                </button>
+                <button class="dropdown-item" data-unit="fahrenheit">
+                  <span data-i18n="unit_fahrenheit">Fahrenheit (°F)</span>
+                  <span class="check">✓</span>
+                </button>
+              </div>
+
+              <div class="dropdown-section">
+                <p class="dropdown-label" data-i18n="label_wind_speed">
+                  Wind Speed
+                </p>
+                <button class="dropdown-item active" data-unit="kmh">
+                  <span data-i18n="unit_kmh">km/h</span>
+                  <span class="check">✓</span>
+                </button>
+                <button class="dropdown-item" data-unit="mph">
+                  <span data-i18n="unit_mph">mph</span>
+                  <span class="check">✓</span>
+                </button>
+              </div>
+
+              <div class="dropdown-section">
+                <p class="dropdown-label" data-i18n="label_precipitation">
+                  Precipitation
+                </p>
+                <button class="dropdown-item active" data-unit="mm">
+                  <span data-i18n="unit_mm">Millimeters (mm)</span>
+                  <span class="check">✓</span>
+                </button>
+                <button class="dropdown-item" data-unit="inch">
+                  <span data-i18n="unit_inch">Inches (in)</span>
+                  <span class="check">✓</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -73,7 +128,9 @@
 
       <div class="main">
         <section class="search-section">
-          <h1 class="search-title">How's the sky looking today?</h1>
+          <h1 class="search-title" data-i18n="search_title">
+            How's the sky looking today?
+          </h1>
           <form class="search-form">
             <div class="input-group" style="position: relative">
               <img
@@ -86,6 +143,7 @@
                 id="search-input"
                 class="search-input-field"
                 placeholder="Search for a place..."
+                data-i18n="search_placeholder"
                 autocomplete="off"
               />
               <ul
@@ -93,12 +151,21 @@
                 class="suggestions-dropdown hidden"
               ></ul>
             </div>
-            <button type="submit" id="search-button" class="btn-search">
+            <button
+              type="submit"
+              id="search-button"
+              class="btn-search"
+              data-i18n="search_button"
+            >
               Search
             </button>
           </form>
 
-          <p id="search-error" class="search-error hidden">
+          <p
+            id="search-error"
+            class="search-error hidden"
+            data-i18n="search_error"
+          >
             No search result found!
           </p>
         </section>
@@ -107,14 +174,16 @@
           <div class="error-icon-wrapper">
             <img src="assets/images/icon-error.svg" class="error-img" alt="" />
           </div>
-          <h2 class="error-main-title">Something went wrong</h2>
-          <p class="error-description">
+          <h2 class="error-main-title" data-i18n="error_title">
+            Something went wrong
+          </h2>
+          <p class="error-description" data-i18n="error_description">
             We couldn't connect to the server (API error). Please try<br />again
             in a few moments.
           </p>
           <button id="retry-btn" class="btn-retry">
             <img src="assets/images/icon-retry.svg" alt="" />
-            Retry
+            <span data-i18n="retry_button">Retry</span>
           </button>
         </div>
 
@@ -141,25 +210,33 @@
 
               <section class="metric-weather">
                 <div class="metric-card">
-                  <h3 class="metric-title">Feel like</h3>
+                  <h3 class="metric-title" data-i18n="metric_feels_like">
+                    Feel like
+                  </h3>
                   <p id="feel-like" class="metric-value">--</p>
                 </div>
                 <div class="metric-card">
-                  <h3 class="metric-title">Humidity</h3>
+                  <h3 class="metric-title" data-i18n="metric_humidity">
+                    Humidity
+                  </h3>
                   <p id="humidity" class="metric-value">--</p>
                 </div>
                 <div class="metric-card">
-                  <h3 class="metric-title">Wind</h3>
+                  <h3 class="metric-title" data-i18n="metric_wind">Wind</h3>
                   <p id="wind" class="metric-value">--</p>
                 </div>
                 <div class="metric-card">
-                  <h3 class="metric-title">Precipitation</h3>
+                  <h3 class="metric-title" data-i18n="metric_precipitation">
+                    Precipitation
+                  </h3>
                   <p id="precipitation" class="metric-value">--</p>
                 </div>
               </section>
 
               <section class="daily-forecast">
-                <h3 class="daily-title">Daily Forecast</h3>
+                <h3 class="daily-title" data-i18n="daily_forecast_title">
+                  Daily Forecast
+                </h3>
                 <div class="day-cards-grid">
                   <div class="day-card">
                     <h4 class="day-name">--</h4>
@@ -252,11 +329,13 @@
             <div class="right-column">
               <section class="hourly-forecast">
                 <div class="hourly-header">
-                  <h3 class="hourly-title">Hourly forecast</h3>
+                  <h3 class="hourly-title" data-i18n="hourly_forecast_title">
+                    Hourly forecast
+                  </h3>
 
                   <div class="dropdown-container">
                     <button id="hourly-btn" class="hourly-btn">
-                      <span id="hourly-selected-day">--</span>
+                      <span id="hourly-selected-day" data-i18n="Today">--</span>
                       <img
                         class="dropdown-icon"
                         src="assets/images/icon-dropdown.svg"
@@ -391,6 +470,7 @@
         </div>
       </div>
     </div>
-    <script src="app.js"></script>
+    <script src="scripts/translation.js"></script>
+    <script src="scripts/app.js"></script>
   </body>
 </html>

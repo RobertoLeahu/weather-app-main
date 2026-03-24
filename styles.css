@@ -85,6 +85,11 @@ body {
   width: 125px;
 }
 
+.dropdown-buttons {
+  display: flex;
+  align-items: center;
+}
+
 .units-btn {
   background-color: var(--neutral-800);
   color: var(--neutral-0);
