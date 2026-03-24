@@ -146,6 +146,14 @@
                 data-i18n="search_placeholder"
                 autocomplete="off"
               />
+              <button
+                type="button"
+                id="clear-btn"
+                class="clear-search-btn hidden"
+              >
+                ✕
+              </button>
+
               <ul
                 id="search-suggestions"
                 class="suggestions-dropdown hidden"
@@ -169,6 +177,11 @@
             No search result found!
           </p>
         </section>
+
+        <div id="default-suggestions" class="default-suggestions">
+          <h3 data-i18n="suggested_cities">Suggested Cities</h3>
+          <div id="suggested-cities-list" class="suggested-cities-list"></div>
+        </div>
 
         <div id="api-error-content" class="api-error-container hidden">
           <div class="error-icon-wrapper">

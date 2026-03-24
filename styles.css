@@ -200,6 +200,33 @@ body {
   transition: border-color 0.2s ease;
 }
 
+/* BOTÓN LIMPIAR BUSCADOR (X) */
+.clear-search-btn {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--neutral-300);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-search-btn:hover {
+  color: var(--neutral-0);
+}
+
+.clear-search-btn.hidden {
+  display: none;
+}
+
+.search-input-field {
+  padding: 15px 48px 15px 48px;
+}
+
 /* ESTADOS TRADICIONALES PARA INPUT */
 .search-input-field:hover,
 .search-input-field:focus {
@@ -228,6 +255,49 @@ body {
   background-color: var(--blue-700);
   outline-color: var(--blue-500);
   outline-offset: 2px;
+}
+
+/* CIUDADES SUGERIDAS POR DEFECTO */
+.default-suggestions {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.default-suggestions.hidden {
+  display: none;
+}
+
+.default-suggestions h3 {
+  font-size: 1rem;
+  color: var(--neutral-300);
+  margin-bottom: 16px;
+  font-family: var(--font-secondary);
+}
+
+.suggested-cities-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.suggested-city-btn {
+  background-color: var(--neutral-800);
+  border: 1px solid var(--neutral-600);
+  color: var(--neutral-0);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.suggested-city-btn:hover {
+  background-color: var(--neutral-700);
+  transform: scale(1.02);
 }
 
 /* DASHBOARD Y COLUMNAS */
@@ -598,7 +668,7 @@ body {
   gap: 4px;
 }
 
-/* --- ESTILOS PARA ERROR TÉCNICO DE API (Imagen de referencia) --- */
+/* --- ESTILOS PARA ERROR TÉCNICO DE API --- */
 .api-error-container {
   display: flex;
   flex-direction: column;

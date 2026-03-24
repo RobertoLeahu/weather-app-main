@@ -36,8 +36,16 @@ const weatherCodeMap = {
   ],
 };
 
-//Ciudad predeterminada al abrir la app
-const DEFAULT_CITY = "Madrid";
+// Lista de ciudades por defecto
+const predefinedCities = [
+  { name: "Madrid", country: "Spain", lat: 40.4165, long: -3.7026 },
+  { name: "New York", country: "United States", lat: 40.7143, long: -74.006 },
+  { name: "Tokyo", country: "Japan", lat: 35.6895, long: 139.6917 },
+  { name: "London", country: "United Kingdom", lat: 51.5085, long: -0.1257 },
+  { name: "Paris", country: "France", lat: 48.8534, long: 2.3488 },
+];
+
+//Iniciar app
 document.addEventListener("DOMContentLoaded", initApp);
 
 let globalWeatherData = null;
@@ -57,7 +65,14 @@ const searchButton = document.getElementById("search-button");
 const searchSuggestions = document.getElementById("search-suggestions");
 const searchError = document.getElementById("search-error");
 const weatherContent = document.getElementById("weather-content");
+const clearBtn = document.getElementById("clear-btn");
 searchFrom.addEventListener("submit", getLatAndLong);
+
+//Elementos ciudades sugeridas
+const defaultSuggestionsContainer = document.getElementById(
+  "default-suggestions",
+);
+const suggestedCitiesList = document.getElementById("suggested-cities-list");
 
 //Elementos tiempo actual
 const locationDisplay = document.getElementById("location");
@@ -81,6 +96,22 @@ const apiErrorCode = document.getElementById("api-error-code");
 const searchSection = document.querySelector(".search-section");
 const retryBtn = document.getElementById("retry-btn");
 
+//Evento de clic al botón "X"
+clearBtn.addEventListener("click", () => {
+  searchInput.value = "";
+  clearBtn.classList.add("hidden");
+  searchSuggestions.classList.add("hidden");
+  searchError.classList.add("hidden");
+
+  defaultSuggestionsContainer.classList.remove("hidden");
+
+  if (globalWeatherData) {
+    weatherContent.classList.remove("hidden");
+  }
+
+  searchInput.focus();
+});
+
 // Evento para el botón de "Retry" cuando la API da error
 retryBtn.addEventListener("click", () => {
   location.reload();
@@ -91,10 +122,21 @@ searchInput.addEventListener("input", (event) => {
   const query = event.target.value.trim();
   clearTimeout(searchTimeout);
 
+  if (query.length > 0) {
+    clearBtn.classList.remove("hidden");
+  } else {
+    clearBtn.classList.add("hidden");
+    defaultSuggestionsContainer.classList.remove("hidden");
+
+    if (globalWeatherData) {
+      weatherContent.classList.remove("hidden");
+    }
+    searchError.classList.add("hidden");
+  }
+
   if (query.length < 2) {
     searchSuggestions.innerHTML = "";
     searchSuggestions.classList.add("hidden");
-    searchError.classList.add("hidden");
     return;
   }
 
@@ -243,6 +285,7 @@ async function getLatAndLong(event) {
     if (geoData.results && geoData.results.length > 0) {
       searchError.classList.add("hidden");
       weatherContent.classList.remove("hidden");
+      defaultSuggestionsContainer.classList.add("hidden");
 
       const currentLat = geoData.results[0].latitude;
       const currentLong = geoData.results[0].longitude;
@@ -256,6 +299,7 @@ async function getLatAndLong(event) {
       weatherContent.classList.add("hidden");
       searchError.classList.remove("hidden");
       searchSuggestions.classList.add("hidden");
+      defaultSuggestionsContainer.classList.remove("hidden");
     }
   } catch (error) {
     console.error("Error cargando la ciudad introducida:", error);
@@ -323,7 +367,11 @@ function syncUnitsUI() {
   //Actualizar el texto del botón principal según lo que haya guardado
   if (tempUnit === "celsius" && windUnit === "kmh" && precipUnit === "mm") {
     switchSystemBtn.innerText = "Switch to Imperial";
-  } else if (tempUnit === "fahrenheit" && windUnit === "mph" && precipUnit === "inch") {
+  } else if (
+    tempUnit === "fahrenheit" &&
+    windUnit === "mph" &&
+    precipUnit === "inch"
+  ) {
     switchSystemBtn.innerText = "Switch to Metric";
   } else {
     switchSystemBtn.innerText = "Mixed System";
@@ -507,7 +555,7 @@ function formatDate(date, mode) {
 //Función para obtener y mostrar las sugerencias de ciudades
 async function fetchSuggestions(query) {
   try {
-    const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&language=${currentLang}`;
+    const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=10&language=${currentLang}`;
     const response = await fetch(geoURL);
     const data = await response.json();
 
@@ -524,6 +572,7 @@ async function fetchSuggestions(query) {
         li.addEventListener("click", () => {
           searchInput.value = city.name;
           searchSuggestions.classList.add("hidden");
+          defaultSuggestionsContainer.classList.add("hidden");
           getWeather(city.latitude, city.longitude, city.name, city.country);
         });
 
@@ -559,9 +608,29 @@ async function loadDefaultWeather(cityName) {
   }
 }
 
+function renderDefaultSuggestions() {
+  suggestedCitiesList.innerHTML = "";
+  predefinedCities.forEach((city) => {
+    const btn = document.createElement("button");
+    btn.className = "suggested-city-btn";
+    btn.innerText = city.name;
+    btn.addEventListener("click", () => {
+      searchInput.value = city.name;
+      clearBtn.classList.remove("hidden");
+      defaultSuggestionsContainer.classList.add("hidden");
+      getWeather(city.lat, city.long, city.name, city.country);
+    });
+    suggestedCitiesList.appendChild(btn);
+  });
+}
+
 // Función inicialización de la app / reconocer ubicación del usuario
 function initApp() {
   syncUnitsUI();
+  renderDefaultSuggestions();
+
+  defaultSuggestionsContainer.classList.remove("hidden");
+
   if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -587,18 +656,12 @@ function initApp() {
         }
       },
       (error) => {
-        console.warn(
-          `Error de Geolocalización (Código ${error.code}): ${error.message}`,
-        );
         console.warn("Cargando ciudad por defecto...");
-        loadDefaultWeather(DEFAULT_CITY);
+        getWeather(40.4165, -3.7026, "Madrid", "Spain");
       },
     );
   } else {
-    console.warn(
-      "Geolocalización no soportada por el navegador. Cargando ciudad por defecto.",
-    );
-    loadDefaultWeather(DEFAULT_CITY);
+    getWeather(40.4165, -3.7026, "Madrid", "Spain");
   }
 }
 

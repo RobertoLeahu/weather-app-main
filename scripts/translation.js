@@ -19,6 +19,7 @@ const translations = {
     search_placeholder: "Search for a place...",
     search_button: "Search",
     search_error: "No search result found!",
+    suggested_cities: "Suggested Cities",
     error_title: "Something went wrong",
     error_description:
       "We couldn't connect to the server (API error). Please try again in a few moments.",
@@ -51,6 +52,7 @@ const translations = {
     search_placeholder: "Busca un lugar...",
     search_button: "Buscar",
     search_error: "¡No se encontraron resultados!",
+    suggested_cities: "Ciudades sugeridas",
     error_title: "Algo salió mal",
     error_description:
       "No pudimos conectar con el servidor. Por favor, inténtalo de nuevo en unos momentos.",
