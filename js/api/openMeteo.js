@@ -1,3 +1,4 @@
+// Función para obtener las coordenadas (latitud y longitud) y datos geográficos exactos a partir del nombre de una ciudad.
 export async function fetchCoordinates(cityName, lang) {
   const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&language=${lang}`;
   const response = await fetch(geoURL);
@@ -9,6 +10,7 @@ export async function fetchCoordinates(cityName, lang) {
   return await response.json();
 }
 
+// Función para obtener todos los datos meteorológicos (actuales, por hora y diarios) basándose en unas coordenadas y aplicando las unidades de medida elegidas.
 export async function fetchWeather(lat, long, units) {
   const { tempUnit, windUnit, precipUnit } = units;
 
@@ -27,13 +29,4 @@ export async function fetchWeather(lat, long, units) {
   }
 
   return data;
-}
-
-export async function fetchSuggestionsAPI(query, lang) {
-  const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=10&language=${lang}`;
-  const response = await fetch(geoURL);
-
-  if (!response.ok) throw new Error("Error buscando sugerencias");
-
-  return await response.json();
 }

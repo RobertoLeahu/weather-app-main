@@ -1,4 +1,4 @@
-//Diccionario i18n
+// Diccionario i18n con todos los textos estáticos de la aplicación
 export const translations = {
   en: {
     app_title: "Weather app",
@@ -68,10 +68,12 @@ export const translations = {
   },
 };
 
+// Variable global que guarda el idioma actual basándose en LocalStorage o en el idioma del navegador
 export let currentLang =
   localStorage.getItem("app_lang") ||
   (navigator.language.startsWith("es") ? "es" : "en");
 
+// Función para aplicar el idioma seleccionado en toda la interfaz, guardar la preferencia del usuario y actualizar los textos estáticos del DOM.
 export function applyLanguage(lang) {
   currentLang = lang;
   localStorage.setItem("app_lang", lang);

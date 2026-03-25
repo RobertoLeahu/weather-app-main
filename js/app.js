@@ -1,15 +1,14 @@
 import {
   fetchCoordinates,
-  fetchWeather,
-  fetchSuggestionsAPI,
+  fetchWeather
 } from "./api/openMeteo.js";
-import { weatherCodeMap, predefinedCities } from "./utils/constants.js";
-import { formatTime, formatDate } from "./utils/helpers.js";
+import { predefinedCities } from "./utils/constants.js";
 import {
   translations,
   currentLang,
   applyLanguage,
 } from "./i18n/translation.js";
+import { updateUI, syncUnitsUI, showApiError } from "./ui/render.js";
 
 //Iniciar app
 document.addEventListener("DOMContentLoaded", initApp);
@@ -38,16 +37,6 @@ const defaultSuggestionsContainer = document.getElementById(
 );
 const suggestedCitiesList = document.getElementById("suggested-cities-list");
 
-//Elementos tiempo actual
-const locationDisplay = document.getElementById("location");
-const dateDisplay = document.getElementById("date");
-const weatherDisplay = document.getElementById("current-weather");
-const temperatureDisplay = document.getElementById("current-temperature");
-const feelLikeDisplay = document.getElementById("feel-like");
-const humidityDsiplay = document.getElementById("humidity");
-const windDisplay = document.getElementById("wind");
-const precipitationDisplay = document.getElementById("precipitation");
-
 //Elementos de los desplegables
 const unitsBtn = document.getElementById("units-btn");
 const unitsDropdown = document.getElementById("units-dropdown");
@@ -62,7 +51,6 @@ const langItems = document.querySelectorAll(".lang-item");
 
 //Elementos mensaje de error de la API
 const apiErrorContent = document.getElementById("api-error-content");
-const apiErrorCode = document.getElementById("api-error-code");
 const searchSection = document.querySelector(".search-section");
 const retryBtn = document.getElementById("retry-btn");
 
@@ -138,7 +126,12 @@ langItems.forEach((btn) => {
     langDropdown.classList.add("hidden");
 
     if (globalWeatherData) {
-      updateUI(globalWeatherData, currentCityName, currentCountryName);
+      updateUI(
+        globalWeatherData,
+        currentCityName,
+        currentCountryName,
+        currentLang,
+      );
     }
   });
 });
@@ -312,55 +305,19 @@ async function loadWeatherAndUI(lat, long, cityName, countryName) {
   currentCountryName = countryName;
 
   try {
-    // Empaquetamos las unidades para enviarlas al módulo
     const units = { tempUnit, windUnit, precipUnit };
 
-    // Usamos el módulo importado
     const weatherData = await fetchWeather(lat, long, units);
     globalWeatherData = weatherData;
 
-    // Actualizamos la interfaz
     searchError.classList.add("hidden");
     apiErrorContent.classList.add("hidden");
     weatherContent.classList.remove("hidden");
 
-    updateUI(weatherData, cityName, countryName);
+    updateUI(weatherData, cityName, countryName, currentLang);
   } catch (error) {
     console.error("Critical error fetching weather data:", error);
     showApiError();
-  }
-}
-
-//Función para actualizar la UI
-function updateUI(weatherData, cityName, countryName) {
-  updateCurrentWeather(weatherData, cityName, countryName);
-  updateMetrics(weatherData);
-  updateDailyForecast(weatherData);
-  updateHourlyForecast(weatherData);
-}
-
-//Función para aplicar las clases 'active' correctas al cargar la página
-function syncUnitsUI() {
-  unitButtons.forEach((btn) => {
-    const unit = btn.getAttribute("data-unit");
-    if (unit === tempUnit || unit === windUnit || unit === precipUnit) {
-      btn.classList.add("active");
-    } else {
-      btn.classList.remove("active");
-    }
-  });
-
-  //Actualizar el texto del botón principal según lo que haya guardado
-  if (tempUnit === "celsius" && windUnit === "kmh" && precipUnit === "mm") {
-    switchSystemBtn.innerText = "Switch to Imperial";
-  } else if (
-    tempUnit === "fahrenheit" &&
-    windUnit === "mph" &&
-    precipUnit === "inch"
-  ) {
-    switchSystemBtn.innerText = "Switch to Metric";
-  } else {
-    switchSystemBtn.innerText = "Mixed System";
   }
 }
 
@@ -568,17 +525,10 @@ function renderDefaultSuggestions() {
   });
 }
 
-// Función mostrar error de conexión a la API
-function showApiError() {
-  searchSection.classList.add("hidden");
-  weatherContent.classList.add("hidden");
-  apiErrorContent.classList.remove("hidden");
-}
-
 // Función inicialización de la app / reconocer ubicación del usuario
 function initApp() {
   applyLanguage(currentLang);
-  syncUnitsUI();
+  syncUnitsUI(tempUnit, windUnit, precipUnit);
   renderDefaultSuggestions();
 
   defaultSuggestionsContainer.classList.remove("hidden");
