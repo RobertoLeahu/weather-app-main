@@ -1,3 +1,5 @@
+import { fetchCoordinates, fetchWeather, fetchSuggestionsAPI } from './api/openMeteo.js';
+
 //Códigos de interpretación de tiempo
 const weatherCodeMap = {
   0: ["Cielo despejado", "assets/images/icon-sunny.webp"],
@@ -84,7 +86,7 @@ const searchSuggestions = document.getElementById("search-suggestions");
 const searchError = document.getElementById("search-error");
 const weatherContent = document.getElementById("weather-content");
 const clearBtn = document.getElementById("clear-btn");
-searchFrom.addEventListener("submit", getLatAndLong);
+searchFrom.addEventListener("submit", handleSearch);
 
 //Elementos ciudades sugeridas
 const defaultSuggestionsContainer = document.getElementById(
@@ -225,7 +227,7 @@ unitButtons.forEach((button) => {
     }
 
     if (currentLat && currentLong) {
-      getWeather(currentLat, currentLong, currentCityName, currentCountryName);
+      loadWeatherAndUI(currentLat, currentLong, currentCityName, currentCountryName);
 
       unitsDropdown.classList.add("hidden");
     }
@@ -280,7 +282,7 @@ switchSystemBtn.addEventListener("click", () => {
   });
 
   if (currentLat && currentLong) {
-    getWeather(currentLat, currentLong, currentCityName, currentCountryName);
+    loadWeatherAndUI(currentLat, currentLong, currentCityName, currentCountryName);
 
     unitsDropdown.classList.add("hidden");
   }
@@ -288,31 +290,26 @@ switchSystemBtn.addEventListener("click", () => {
 
 // -- LÓGICA DE LA API --
 //Función para obtener la latitud y longitud de una ciudad, para luego utilizar estos datos para recoger los datos meteorológicos.
-async function getLatAndLong(event) {
+async function handleSearch(event) {
+  event.preventDefault();
+  const cityName = searchInput.value.trim();
+
+  if (!cityName) return;
+
   try {
-    event.preventDefault();
-    const cityName = searchInput.value.trim();
-
-    // Si el usuario le da a buscar con el input vacío, no hace nada
-    if (!cityName) return;
-
-    const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&language=${currentLang}`;
-    const geoResponse = await fetch(geoURL);
-    const geoData = await geoResponse.json();
+    // Usamos el módulo importado
+    const geoData = await fetchCoordinates(cityName, currentLang);
 
     if (geoData.results && geoData.results.length > 0) {
       searchError.classList.add("hidden");
       weatherContent.classList.remove("hidden");
       defaultSuggestionsContainer.classList.add("hidden");
-
-      const currentLat = geoData.results[0].latitude;
-      const currentLong = geoData.results[0].longitude;
-      const currentCityName = geoData.results[0].name;
-      const currentCountryName = geoData.results[0].country;
-
-      getWeather(currentLat, currentLong, currentCityName, currentCountryName);
-
       searchSuggestions.classList.add("hidden");
+
+      const { latitude, longitude, name, country } = geoData.results[0];
+      
+      // Llamamos a la nueva función de clima
+      await loadWeatherAndUI(latitude, longitude, name, country);
     } else {
       weatherContent.classList.add("hidden");
       searchError.classList.remove("hidden");
@@ -326,37 +323,27 @@ async function getLatAndLong(event) {
 }
 
 //Función para recoger los datos meteorológicos necesarios usando la latitud y longitud.
-async function getWeather(lat, long, cityName, countryName) {
+async function loadWeatherAndUI(lat, long, cityName, countryName) {
+  // Actualizamos el estado global
   currentLat = lat;
   currentLong = long;
   currentCityName = cityName;
   currentCountryName = countryName;
 
-  const weatherURL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&temperature_unit=${tempUnit}&wind_speed_unit=${windUnit}&precipitation_unit=${precipUnit}`;
-
   try {
-    const weatherResponse = await fetch(weatherURL);
-
-    if (!weatherResponse.ok) {
-      throw new Error(`Server Response: ${weatherResponse.status}`);
-    }
-
-    const weatherData = await weatherResponse.json();
-
+    // Empaquetamos las unidades para enviarlas al módulo
+    const units = { tempUnit, windUnit, precipUnit };
+    
+    // Usamos el módulo importado
+    const weatherData = await fetchWeather(lat, long, units);
     globalWeatherData = weatherData;
 
-    if (weatherData.error) {
-      throw new Error(`API Validation Error: ${weatherData.reason}`);
-    }
-
+    // Actualizamos la interfaz
     searchError.classList.add("hidden");
     apiErrorContent.classList.add("hidden");
     weatherContent.classList.remove("hidden");
 
-    updateCurrentWeather(weatherData, cityName, countryName);
-    updateMetrics(weatherData);
-    updateDailyForecast(weatherData);
-    updateHourlyForecast(weatherData);
+    updateUI(weatherData, cityName, countryName);
   } catch (error) {
     console.error("Critical error fetching weather data:", error);
     showApiError();
@@ -589,7 +576,7 @@ async function fetchSuggestions(query) {
           searchInput.value = city.name;
           searchSuggestions.classList.add("hidden");
           defaultSuggestionsContainer.classList.add("hidden");
-          getWeather(city.latitude, city.longitude, city.name, city.country);
+          loadWeatherAndUI(city.latitude, city.longitude, city.name, city.country);
         });
 
         searchSuggestions.appendChild(li);
@@ -605,7 +592,7 @@ async function fetchSuggestions(query) {
 }
 
 //Función para mostrar de manera predeterminada una ciudad al abrir la app
-async function loadDefaultWeather(cityName) {
+/* async function loadDefaultWeather(cityName) {
   try {
     const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&language=es`;
     const geoResponse = await fetch(geoURL);
@@ -616,13 +603,13 @@ async function loadDefaultWeather(cityName) {
       var longitude = geoData.results[0].longitude;
       var name = geoData.results[0].name;
       var country = geoData.results[0].country;
-      getWeather(latitude, longitude, name, country);
+      loadWeatherAndUI(latitude, longitude, name, country);
     }
   } catch (error) {
     console.error("Error cargando ciudad por defecto:", error);
     showApiError();
   }
-}
+} */
 
 //Función para sugerir 5 ciudades aleatorias
 function renderDefaultSuggestions() {
@@ -641,7 +628,7 @@ function renderDefaultSuggestions() {
       searchInput.value = city.name;
       clearBtn.classList.remove("hidden");
       defaultSuggestionsContainer.classList.add("hidden");
-      getWeather(city.lat, city.long, city.name, city.country);
+      loadWeatherAndUI(city.lat, city.long, city.name, city.country);
     });
 
     suggestedCitiesList.appendChild(btn);
@@ -680,18 +667,18 @@ function initApp() {
             "Tu ubicación";
           const countryName = data.address.country || "";
 
-          getWeather(lat, long, cityName, countryName);
+          loadWeatherAndUI(lat, long, cityName, countryName);
         } catch (error) {
           console.error("Error al obtener el nombre de la ubicación:", error);
-          getWeather(lat, long, "Tu ubicación actual", "");
+          loadWeatherAndUI(lat, long, "Tu ubicación actual", "");
         }
       },
       (error) => {
         console.warn("Cargando ciudad por defecto...");
-        getWeather(40.4165, -3.7026, "Madrid", "Spain");
+        loadWeatherAndUI(40.4165, -3.7026, "Madrid", "Spain");
       },
     );
   } else {
-    getWeather(40.4165, -3.7026, "Madrid", "Spain");
+    loadWeatherAndUI(40.4165, -3.7026, "Madrid", "Spain");
   }
 }
