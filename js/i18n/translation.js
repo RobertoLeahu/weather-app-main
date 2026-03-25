@@ -1,5 +1,5 @@
 //Diccionario i18n
-const translations = {
+export const translations = {
   en: {
     app_title: "Weather app",
     lang_en: "English",
@@ -68,48 +68,14 @@ const translations = {
   },
 };
 
-//Detectar idioma
-let currentLang =
+export let currentLang =
   localStorage.getItem("app_lang") ||
   (navigator.language.startsWith("es") ? "es" : "en");
 
-//Elementos traducción
-const langBtn = document.getElementById("lang-btn");
-const langDropdown = document.getElementById("lang-dropdown");
-const currentLangText = document.getElementById("current-lang-text");
-const langItems = document.querySelectorAll(".lang-item");
-
-//Abrir/cerrar menú de idiomas
-langBtn.addEventListener("click", () => {
-  langDropdown.classList.toggle("hidden");
-  unitsDropdown.classList.add("hidden");
-  daysDropdown.classList.add("hidden");
-});
-
-//Cerrar menús al hacer clic fuera de ellos
-document.addEventListener("click", (event) => {
-  if (!langBtn.contains(event.target) && !langDropdown.contains(event.target)) {
-    langDropdown.classList.add("hidden");
-  }
-});
-
-//Evento al hacer clic en un idioma
-langItems.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    applyLanguage(btn.getAttribute("data-lang"));
-    langDropdown.classList.add("hidden");
-
-    if (globalWeatherData) {
-      updateUI(globalWeatherData, currentCityName, currentCountryName);
-    }
-  });
-});
-
-//Función aplicar lenguaje al cargar la página
-function applyLanguage(lang) {
+export function applyLanguage(lang) {
   currentLang = lang;
   localStorage.setItem("app_lang", lang);
-  currentLangText.innerText = lang.toUpperCase();
+  document.getElementById("current-lang-text").innerText = lang.toUpperCase();
 
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
@@ -123,9 +89,7 @@ function applyLanguage(lang) {
     searchInput.placeholder = translations[lang].search_placeholder;
   }
 
-  langItems.forEach((btn) => {
+  document.querySelectorAll(".lang-item").forEach((btn) => {
     btn.classList.toggle("active", btn.getAttribute("data-lang") === lang);
   });
 }
-
-applyLanguage(currentLang);

@@ -1,12 +1,21 @@
-import { fetchCoordinates, fetchWeather, fetchSuggestionsAPI } from './api/openMeteo.js';
-import { weatherCodeMap, predefinedCities } from './utils/constants.js';
+import {
+  fetchCoordinates,
+  fetchWeather,
+  fetchSuggestionsAPI,
+} from "./api/openMeteo.js";
+import { weatherCodeMap, predefinedCities } from "./utils/constants.js";
+import { formatTime, formatDate } from "./utils/helpers.js";
+import {
+  translations,
+  currentLang,
+  applyLanguage,
+} from "./i18n/translation.js";
 
 //Iniciar app
 document.addEventListener("DOMContentLoaded", initApp);
 
-let globalWeatherData = null;
-
 //Estado global en memoria de la app
+let globalWeatherData = null;
 let currentLat, currentLong, currentCityName, currentCountryName;
 let tempUnit = localStorage.getItem("tempUnit") || "celsius";
 let windUnit = localStorage.getItem("windUnit") || "kmh";
@@ -17,7 +26,6 @@ let precipUnit = localStorage.getItem("precipUnit") || "mm";
 let searchTimeout;
 const searchFrom = document.querySelector(".search-form");
 const searchInput = document.getElementById("search-input");
-const searchButton = document.getElementById("search-button");
 const searchSuggestions = document.getElementById("search-suggestions");
 const searchError = document.getElementById("search-error");
 const weatherContent = document.getElementById("weather-content");
@@ -45,6 +53,12 @@ const unitsBtn = document.getElementById("units-btn");
 const unitsDropdown = document.getElementById("units-dropdown");
 const hourlyBtn = document.getElementById("hourly-btn");
 const daysDropdown = document.getElementById("days-dropdown");
+
+//Elementos traducción
+const langBtn = document.getElementById("lang-btn");
+const langDropdown = document.getElementById("lang-dropdown");
+const currentLangText = document.getElementById("current-lang-text");
+const langItems = document.querySelectorAll(".lang-item");
 
 //Elementos mensaje de error de la API
 const apiErrorContent = document.getElementById("api-error-content");
@@ -111,6 +125,24 @@ hourlyBtn.addEventListener("click", () => {
   unitsDropdown.classList.add("hidden");
 });
 
+langBtn.addEventListener("click", () => {
+  langDropdown.classList.toggle("hidden");
+  unitsDropdown.classList.add("hidden");
+  daysDropdown.classList.add("hidden");
+});
+
+langItems.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const newLang = btn.getAttribute("data-lang");
+    applyLanguage(newLang);
+    langDropdown.classList.add("hidden");
+
+    if (globalWeatherData) {
+      updateUI(globalWeatherData, currentCityName, currentCountryName);
+    }
+  });
+});
+
 //Cerrar menús al hacer clic fuera de ellos
 document.addEventListener("click", (event) => {
   if (
@@ -133,6 +165,10 @@ document.addEventListener("click", (event) => {
   ) {
     daysDropdown.classList.add("hidden");
   }
+
+  if (!langBtn.contains(event.target) && !langDropdown.contains(event.target)) {
+    langDropdown.classList.add("hidden");
+  }
 });
 
 // -- LÓGICA DE LOS BOTONES DE UNIDADES -
@@ -146,7 +182,6 @@ unitButtons.forEach((button) => {
       .querySelectorAll(".dropdown-item")
       .forEach((btn) => btn.classList.remove("active"));
 
-    // Le ponemos el 'active' al botón que acabamos de pulsar
     button.classList.add("active");
 
     const selectedUnit = button.getAttribute("data-unit");
@@ -163,7 +198,12 @@ unitButtons.forEach((button) => {
     }
 
     if (currentLat && currentLong) {
-      loadWeatherAndUI(currentLat, currentLong, currentCityName, currentCountryName);
+      loadWeatherAndUI(
+        currentLat,
+        currentLong,
+        currentCityName,
+        currentCountryName,
+      );
 
       unitsDropdown.classList.add("hidden");
     }
@@ -218,7 +258,12 @@ switchSystemBtn.addEventListener("click", () => {
   });
 
   if (currentLat && currentLong) {
-    loadWeatherAndUI(currentLat, currentLong, currentCityName, currentCountryName);
+    loadWeatherAndUI(
+      currentLat,
+      currentLong,
+      currentCityName,
+      currentCountryName,
+    );
 
     unitsDropdown.classList.add("hidden");
   }
@@ -243,7 +288,7 @@ async function handleSearch(event) {
       searchSuggestions.classList.add("hidden");
 
       const { latitude, longitude, name, country } = geoData.results[0];
-      
+
       // Llamamos a la nueva función de clima
       await loadWeatherAndUI(latitude, longitude, name, country);
     } else {
@@ -269,7 +314,7 @@ async function loadWeatherAndUI(lat, long, cityName, countryName) {
   try {
     // Empaquetamos las unidades para enviarlas al módulo
     const units = { tempUnit, windUnit, precipUnit };
-    
+
     // Usamos el módulo importado
     const weatherData = await fetchWeather(lat, long, units);
     globalWeatherData = weatherData;
@@ -329,7 +374,7 @@ function updateCurrentWeather(weatherData, cityName, countryName) {
   }
 
   //Actualizar fecha
-  const date = formatDate(weatherData.current.time);
+  const date = formatDate(weatherData.current.time, undefined, currentLang);
   dateDisplay.innerText = date;
   //Obtener código de interpretación de tiempo y actualizar imagen del tiempo actual
   const currentWeatherCode = weatherData.current.weather_code;
@@ -370,7 +415,7 @@ function updateDailyForecast(weatherData) {
 
   dayCards.forEach((card, index) => {
     //Actualizar día
-    const dayName = formatDate(dailyData.time[index], "short");
+    const dayName = formatDate(dailyData.time[index], "short", currentLang);
     card.querySelector(".day-name").innerText = dayName;
 
     //Actualizar imagen del tiempo
@@ -403,7 +448,7 @@ function updateHourlyForecast(weatherData, targetDateString = null) {
   dailyData.time.forEach((dateString, index) => {
     if (dropdownButtons[index]) {
       const btn = dropdownButtons[index];
-      const dayName = formatDate(dateString, "dayOnly");
+      const dayName = formatDate(dateString, "dayOnly", currentLang);
 
       btn.innerText = index === 0 ? translations[currentLang].today : dayName;
 
@@ -449,46 +494,13 @@ function updateHourlyForecast(weatherData, targetDateString = null) {
       card.querySelector(".hourly-icon").src = imagePath;
       card.querySelector(".hourly-icon").alt = condition;
 
-      const time = formatTime(hourlyData.time[apiIndex]);
+      const time = formatTime(hourlyData.time[apiIndex], currentLang);
       card.querySelector(".hourly-time").innerText = time;
 
       const temperature = Math.round(hourlyData.temperature_2m[apiIndex]);
       card.querySelector(".high").innerText = `${temperature}${tempUnit}`;
     }
   });
-}
-
-//Función para formatear la hora que devuelve la API
-function formatTime(date) {
-  const dateObj = new Date(date);
-
-  const locale = currentLang === "es" ? "es-ES" : "en-US";
-
-  const options = {
-    hour: "numeric",
-    hour12: currentLang === "en",
-  };
-
-  return new Intl.DateTimeFormat(locale, options).format(dateObj);
-}
-
-// Función para formatear la fecha (Dinámica según el idioma)
-function formatDate(date, mode) {
-  const dateObj = new Date(date);
-  let options;
-
-  if (mode === "short") {
-    options = { weekday: "short" }; // "Mon" o "lun"
-  } else if (mode === "dayOnly") {
-    options = { weekday: "long" }; // "Monday" o "lunes"
-  } else {
-    options = { weekday: "long", day: "numeric", month: "long" }; // "Monday, March 16" o "lunes, 16 de marzo"
-  }
-
-  const locale = currentLang === "es" ? "es-ES" : "en-US";
-  let dateFormatted = dateObj.toLocaleDateString(locale, options);
-
-  return dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
 }
 
 //Función para obtener y mostrar las sugerencias de ciudades
@@ -512,7 +524,12 @@ async function fetchSuggestions(query) {
           searchInput.value = city.name;
           searchSuggestions.classList.add("hidden");
           defaultSuggestionsContainer.classList.add("hidden");
-          loadWeatherAndUI(city.latitude, city.longitude, city.name, city.country);
+          loadWeatherAndUI(
+            city.latitude,
+            city.longitude,
+            city.name,
+            city.country,
+          );
         });
 
         searchSuggestions.appendChild(li);
@@ -526,26 +543,6 @@ async function fetchSuggestions(query) {
     console.error("Error buscando sugerencias:", error);
   }
 }
-
-//Función para mostrar de manera predeterminada una ciudad al abrir la app
-/* async function loadDefaultWeather(cityName) {
-  try {
-    const geoURL = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&language=es`;
-    const geoResponse = await fetch(geoURL);
-    const geoData = await geoResponse.json();
-
-    if (geoData.results && geoData.results.length > 0) {
-      var latitude = geoData.results[0].latitude;
-      var longitude = geoData.results[0].longitude;
-      var name = geoData.results[0].name;
-      var country = geoData.results[0].country;
-      loadWeatherAndUI(latitude, longitude, name, country);
-    }
-  } catch (error) {
-    console.error("Error cargando ciudad por defecto:", error);
-    showApiError();
-  }
-} */
 
 //Función para sugerir 5 ciudades aleatorias
 function renderDefaultSuggestions() {
@@ -580,6 +577,7 @@ function showApiError() {
 
 // Función inicialización de la app / reconocer ubicación del usuario
 function initApp() {
+  applyLanguage(currentLang);
   syncUnitsUI();
   renderDefaultSuggestions();
 
