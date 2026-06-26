@@ -1,79 +1,95 @@
-# Frontend Mentor - Aplicación del clima
+# Aplicación del clima
 
-![Vista previa del diseño para el desafío de codificación de la aplicación del clima](./preview.jpg)
+Aplicación web del clima desarrollada como solución al [desafío de Frontend Mentor](https://www.frontendmentor.io/challenges/weather-app). Permite consultar el tiempo actual, el pronóstico diario y por horas de cualquier ciudad, con soporte para unidades métricas/imperiales e internacionalización en español e inglés.
 
-## ¡Bienvenido! 👋
+![Vista previa de la aplicación del clima](./preview.jpg)
 
-**Para hacer este desafío, necesitas un buen conocimiento de HTML, CSS y JavaScript.**
+## Características
 
-## El desafío
+- Búsqueda de ciudades con autocompletado y sugerencias predefinidas
+- Detección automática de la ubicación del usuario al cargar la aplicación
+- Condiciones actuales: temperatura, icono del tiempo, ubicación y hora local
+- Métricas adicionales: sensación térmica, humedad, velocidad del viento y precipitación
+- Pronóstico de 7 días con temperaturas máximas/mínimas e iconos del tiempo
+- Pronóstico por horas con selector de día
+- Cambio de unidades (temperatura, viento y precipitación) entre sistema métrico e imperial
+- Interfaz bilingüe (inglés / español)
+- Diseño responsive con estados de hover y focus en los elementos interactivos
+- Manejo de estados de carga y error con opción de reintentar
 
-Construye una aplicación del clima usando la [API de Open-Meteo](https://open-meteo.com/) y haz que se vea lo más parecido posible al diseño.
+## Tecnologías
 
-Puedes usar cualquier herramienta que te guste para completar el desafío. Así que si tienes algo que te gustaría practicar, siéntete libre de intentarlo.
+- HTML5, CSS3 y JavaScript (ES modules)
+- [Open-Meteo API](https://open-meteo.com/) — datos meteorológicos y geocodificación
+- [Nominatim (OpenStreetMap)](https://nominatim.org/) — geocodificación inversa para la ubicación del usuario
+- Fuentes: [DM Sans](https://fonts.google.com/specimen/DM+Sans) y [Bricolage Grotesque](https://fonts.google.com/specimen/Bricolage+Grotesque)
 
-Tus usuarios deberían poder:
+No requiere clave API ni dependencias de npm: es un proyecto estático que se ejecuta directamente en el navegador.
 
-- Buscar información del clima ingresando una ubicación en la barra de búsqueda
-- Ver las condiciones climáticas actuales incluyendo temperatura, icono del clima y detalles de ubicación
-- Ver métricas climáticas adicionales como temperatura de "sensación térmica", porcentaje de humedad, velocidad del viento y cantidades de precipitación
-- Explorar un pronóstico del clima de 7 días con temperaturas máximas/mínimas diarias e iconos del clima
-- Ver un pronóstico por hora que muestre los cambios de temperatura a lo largo del día
-- Cambiar entre diferentes días de la semana usando el selector de días en la sección de pronóstico por hora
-- Alternar entre unidades de medida Imperial y Métrica a través del menú desplegable de unidades
-- Ver el diseño óptimo para la interfaz dependiendo del tamaño de pantalla de su dispositivo
-- Ver los estados de hover y focus para todos los elementos interactivos en la página
+## Estructura del proyecto
 
-## Empezando
+```
+weather-app-main/
+├── index.html              # Estructura de la interfaz
+├── styles.css              # Estilos y variables CSS
+├── style-guide.md          # Colores, tipografías y breakpoints de diseño
+├── assets/
+│   ├── fonts/              # DM Sans y Bricolage Grotesque
+│   └── images/             # Iconos, logos e imágenes del tiempo
+└── js/
+    ├── app.js              # Lógica principal y eventos
+    ├── api/
+    │   └── openMeteo.js    # Peticiones a la API del clima
+    ├── i18n/
+    │   └── translation.js  # Traducciones EN / ES
+    ├── ui/
+    │   └── render.js       # Actualización del DOM
+    └── utils/
+        ├── constants.js    # Códigos WMO e ciudades sugeridas
+        └── helpers.js      # Funciones auxiliares
+```
 
-### Qué se incluye
+## Cómo ejecutar la aplicación
 
-Tu tarea es construir el proyecto siguiendo los diseños dentro de la carpeta `/design`. Encontrarás tanto una versión móvil como de escritorio del diseño.
+La aplicación usa módulos ES (`import`/`export`), por lo que debe servirse mediante un servidor local y no abrirse directamente como archivo (`file://`).
 
-**En tu descarga:**
-- Diseños móvil y de escritorio (formato JPG)
-- Todos los recursos necesarios en la carpeta `/assets`
-- Archivos de fuentes variables y estáticas (o enlace a Google Fonts)
-- `style-guide.md` con colores, fuentes y otras especificaciones de diseño
+**Opción 1 — Live Server (VS Code / Cursor)**  
+Instala la extensión Live Server y abre `index.html` con *Open with Live Server*.
 
-**¿Quieres construcciones más precisas?** Los diseños están en formato JPG estático, lo que significa que necesitarás usar tu mejor criterio para estilos como `font-size`, `padding` y `margin`.
+**Opción 2 — npx serve**
 
-### Configuración de la API
+```bash
+npx serve .
+```
 
-Este proyecto usa la [API de Open-Meteo](https://open-meteo.com/) para obtener datos del clima.
+**Opción 3 — Python**
 
-**Buenas noticias:** ¡Open-Meteo es completamente gratuito y no requiere una clave API! Puedes comenzar a hacer solicitudes de inmediato.
+```bash
+python -m http.server 8000
+```
 
-- **Documentación de la API:** [https://open-meteo.com/en/docs](https://open-meteo.com/en/docs)
-- **Sin límites de tasa** para uso personal razonable
-- Ejemplo de endpoint: `https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true`
+Después abre `http://localhost:8000` (o el puerto que indique la herramienta) en el navegador.
 
-Consulta su documentación para todos los parámetros climáticos disponibles y capacidades de búsqueda de ubicación.
+## API
 
-## Construyendo tu proyecto
+Los datos meteorológicos provienen de [Open-Meteo](https://open-meteo.com/):
 
-Siéntete libre de usar cualquier flujo de trabajo con el que te sientas cómodo. A continuación hay un proceso sugerido, pero no sientas que necesitas seguir estos pasos:
+- **Documentación:** [https://open-meteo.com/en/docs](https://open-meteo.com/en/docs)
+- **Geocodificación:** [https://open-meteo.com/en/docs/geocoding-api](https://open-meteo.com/en/docs/geocoding-api)
+- Gratuita, sin clave API y con uso razonable sin límites estrictos para proyectos personales
 
-1. Inicializa tu proyecto como un repositorio público en [GitHub](https://github.com/). Crear un repo hará más fácil compartir tu código con la comunidad si necesitas ayuda. Si no estás seguro de cómo hacer esto, [lee este recurso Try Git](https://try.github.io/).
-2. Configura tu repositorio para publicar tu código en una dirección web. Esto también será útil si necesitas ayuda durante un desafío, ya que puedes compartir la URL de tu proyecto con la URL de tu repositorio. Hay varias formas de hacer esto, y proporcionamos algunas recomendaciones a continuación.
-3. Revisa los diseños para comenzar a planificar cómo abordarás el proyecto. Este paso es crucial para ayudarte a pensar con anticipación en las clases CSS para crear estilos reutilizables.
-4. Antes de agregar cualquier estilo, estructura tu contenido con HTML. Escribir tu HTML primero puede ayudar a enfocar tu atención en crear contenido bien estructurado.
-5. Crea un archivo CSS separado (por ejemplo, `styles.css`) y vincúlalo en el `<head>` de tu HTML usando `<link rel="stylesheet" href="styles.css">`.
-6. Define en el CSS los tokens de diseño definidos en el archivo style-guide.md, usando `:root` para colores y tipografías. Ejemplo:
-   ```css
-   :root {
-     /* Colores */
-     --color-primary: #3b82f6;
-     --color-background: #0f172a;
-     --color-text: #f1f5f9;
-     
-     /* Tipografías */
-     --font-primary: 'DM Sans', sans-serif;
-     --font-secondary: 'Bricolage Grotesque', sans-serif;
-     --font-size-base: 16px;
-     --font-size-heading: 2rem;
-   }
-   ```
-7. Escribe los estilos base para tu proyecto utilizando las variables CSS que definiste, aplicando estilos de contenido general.
-8. Comienza agregando estilos en la parte superior de la página y trabaja hacia abajo. Solo pasa a la siguiente sección una vez que estés satisfecho con el área en la que has estado trabajando.
-9. Crea un archivo JavaScript separado (por ejemplo, `app.js`) e impórtalo al final del HTML, justo antes de cerrar la etiqueta `</body>` usando `<script src="app.js"></script>`.
+Ejemplo de endpoint de pronóstico:
+
+```
+https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true
+```
+
+## Diseño
+
+La interfaz sigue la guía de estilo del desafío original. Consulta [`style-guide.md`](./style-guide.md) para colores, tipografías y breakpoints de referencia (375px móvil, 1440px escritorio).
+
+## Créditos
+
+- Desafío y diseño: [Frontend Mentor](https://www.frontendmentor.io/)
+- Datos del clima: [Open-Meteo](https://open-meteo.com/)
+- Geocodificación inversa: [OpenStreetMap / Nominatim](https://nominatim.org/)
