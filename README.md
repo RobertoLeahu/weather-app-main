@@ -1,6 +1,6 @@
 # Aplicación del clima
 
-Aplicación web del clima desarrollada como solución al [desafío de Frontend Mentor](https://www.frontendmentor.io/challenges/weather-app). Permite consultar el tiempo actual, el pronóstico diario y por horas de cualquier ciudad, con soporte para unidades métricas/imperiales e internacionalización en español e inglés.
+Aplicación web del clima desarrollada. Permite consultar el tiempo actual, el pronóstico diario y por horas de cualquier ciudad, con soporte para unidades métricas/imperiales e internacionalización en español e inglés.
 
 ![Vista previa de la aplicación del clima](./preview.jpg)
 
@@ -90,6 +90,5 @@ La interfaz sigue la guía de estilo del desafío original. Consulta [`style-gui
 
 ## Créditos
 
-- Desafío y diseño: [Frontend Mentor](https://www.frontendmentor.io/)
 - Datos del clima: [Open-Meteo](https://open-meteo.com/)
 - Geocodificación inversa: [OpenStreetMap / Nominatim](https://nominatim.org/)
